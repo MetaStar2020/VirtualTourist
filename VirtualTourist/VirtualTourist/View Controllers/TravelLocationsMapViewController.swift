@@ -16,8 +16,7 @@ class TravelLocationsMapViewController: UIViewController {
     
     var dataController: DataController!
     
-    var fetchedResultsController: NSFetchedResultsController<Pin>!
-    
+    var pins: [NSManagedObject] = []
     
     
 //MARK: - View Life Cycle
@@ -29,12 +28,20 @@ class TravelLocationsMapViewController: UIViewController {
         self.mapView.delegate = self
         self.mapView.isZoomEnabled = true
         self.mapView.isScrollEnabled = true
+        title = "Im here!"
             
-        //Retrieving Pin Locations
+        //Fetching Pins from CoreData persistent store
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Pin")
+        do {
+            pins = try dataController.viewContext.fetch(fetchRequest)
+        } catch let error as NSError {
+            print("Could not fetch. \(error), \(error.userInfo)")
+        }
                 
     }
         
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         self.refresh()
     }
         
@@ -52,23 +59,17 @@ class TravelLocationsMapViewController: UIViewController {
         var annotations = [MKPointAnnotation]()
         
         //MARK: - TO DO: use CoreData to populate map with pins
-        for dictionary in VirtualTourist.studentLocations {
+        for dictionary in pins {
                 
-            let lat = CLLocationDegrees(dictionary.latitude ?? 0.0 )
-            let long = CLLocationDegrees(dictionary.longitude ?? 0.0 )
+            let lat = CLLocationDegrees((dictionary.value(forKeyPath: "latitude") as? Double) ?? 0.0 )
+            let long = CLLocationDegrees((dictionary.value(forKeyPath: "longitude") as? Double) ?? 0.0 )
                 
             // The lat and long are used to create a CLLocationCoordinates2D instance.
             let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: long)
                 
-            let first = dictionary.firstName
-            let last = dictionary.lastName
-            let mediaURL = dictionary.mediaURL
-                
             // Creating the annotation and setting its coordiate, title, and subtitle properties
             let annotation = MKPointAnnotation()
             annotation.coordinate = coordinate
-            annotation.title = "\(first) \(last)"
-            annotation.subtitle = mediaURL
                 
             // Adding the annotation in an array of annotations.
             annotations.append(annotation)
@@ -77,6 +78,16 @@ class TravelLocationsMapViewController: UIViewController {
             
         // When the array is complete, we add the annotations to the map.
         self.mapView.addAnnotations(annotations)
+    }
+
+// MARK: - Navigation
+
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        // If this is a NotesListViewController, we'll configure its `Notebook`
+        if let vc = segue.destination as? PhotoAlbumViewController {
+                //vc.pin = fetchedResultsController.object(at: indexPath)
+                vc.dataController = dataController
+        }
     }
 }
 
@@ -102,23 +113,25 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
         
         return pinView
     }
-
+    
+    func mapView(_ mapView: MKMapView, didAdd views: [MKAnnotationView]) {
+        print("User is adding a pin here")
+    }
     
     // This delegate method is implemented to respond to taps. It opens the system browser
     // to the URL specified in the annotationViews subtitle property.
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
         if control == view.rightCalloutAccessoryView {
-            if let mediaURL = view.annotation?.subtitle! {
-                if mediaURL.contains("https"){
-                    if let mediaURL = URL(string: mediaURL){
-                        UIApplication.shared.open(mediaURL, options: [:], completionHandler: nil)
-                    }
-                } else {
-                    ErrorAlertView.showMessage(title: "Incorrect URL Format", msg: "Media contains a wrong URL format", on: self)
-                }
-            }
+            performSegue(withIdentifier: "PhotoAlbum", sender: self)
         }
     }
+}
+
+//MARK: - NSFetchedResults Delegate (required?)
+
+extension TravelLocationsMapViewController: NSFetchedResultsControllerDelegate {
+    
+    // Not sure if its necessary in this case? Do I need to fetch/add to the map everytime there is a change? -- like a refresh to make sure pins are added after saved?
 }
 
 

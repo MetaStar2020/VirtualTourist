@@ -31,11 +31,12 @@
                     <navigationItem key="navigationItem" id="uUr-Di-aAk"/>
                     <connections>
                         <outlet property="mapView" destination="DOh-Q7-NRK" id="cwF-6T-hOG"/>
+                        <segue destination="LfJ-HQ-DuJ" kind="show" identifier="PhotoAlbum" id="7Az-ln-nSN"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1042.0289855072465" y="138.61607142857142"/>
+            <point key="canvasLocation" x="1006" y="139"/>
         </scene>
         <!--Photo Album View Controller-->
         <scene sceneID="RQR-Sf-Wrb">
@@ -47,6 +48,7 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <viewLayoutGuide key="safeArea" id="FwI-s3-sox"/>
                     </view>
+                    <navigationItem key="navigationItem" id="qQV-Ky-EX1"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vSl-eK-OGu" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
