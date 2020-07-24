@@ -83,10 +83,14 @@ class TravelLocationsMapViewController: UIViewController {
 // MARK: - Navigation
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
         // If this is a NotesListViewController, we'll configure its `Notebook`
         if let vc = segue.destination as? PhotoAlbumViewController {
-                //vc.pin = fetchedResultsController.object(at: indexPath)
-                vc.dataController = dataController
+            guard let passedPin = sender as? Pin else {
+                return
+            }
+            vc.pin = passedPin 
+            vc.dataController = dataController
         }
     }
 }
@@ -114,16 +118,27 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
         return pinView
     }
     
+    // Adds new 'pin'(s) as NSManagedObject 'Pin'
     func mapView(_ mapView: MKMapView, didAdd views: [MKAnnotationView]) {
         print("User is adding a pin here")
+        for addedPin in views {
+            let newPin = Pin(context: dataController.viewContext)
+            newPin.latitude = addedPin.annotation?.coordinate.latitude ?? 0.0
+            newPin.longitude = addedPin.annotation?.coordinate.longitude ?? 0.0
+            try? dataController.viewContext.save()
+        }
     }
     
-    // This delegate method is implemented to respond to taps. It opens the system browser
-    // to the URL specified in the annotationViews subtitle property.
-    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
-        if control == view.rightCalloutAccessoryView {
-            performSegue(withIdentifier: "PhotoAlbum", sender: self)
+    //User tapped on the pin
+    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+        
+        guard let annotation = view.annotation else {
+            return
         }
+        
+        mapView.deselectAnnotation(annotation, animated: true)
+        // MARK: - TO DO : fetch the corresponding pin that should be sent under 'sender'
+        performSegue(withIdentifier: "PhotoAlbum", sender: self)
     }
 }
 
