@@ -43,12 +43,12 @@ class TravelLocationsMapViewController: UIViewController {
         self.refresh()
     }
     
-    /* NEED FIX: Doesnt recognize gesture here why?
+    //NEED FIX: Doesnt recognize gesture here why?
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        self.mapView.removeGestureRecognizer()
-    }*/
+        self.mapView.removeGestureRecognizer(uiLPGR)
+    }
         
     //MARK: - IBActions
         
