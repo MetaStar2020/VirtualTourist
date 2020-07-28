@@ -24,10 +24,6 @@ class TravelLocationsMapViewController: UIViewController {
         super.viewDidLoad()
             
         //Set MapView's delegate and properties
-        // Instantiate a long press gesture to the map
-        let uiLPGR = UILongPressGestureRecognizer(target: self, action: #selector(addPin(longGesture:)))
-        self.mapView.addGestureRecognizer(uiLPGR)
-        
         self.mapView.delegate = self
         self.mapView.isZoomEnabled = true
         self.mapView.isScrollEnabled = true
@@ -39,8 +35,20 @@ class TravelLocationsMapViewController: UIViewController {
         
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        // Instantiate a long press gesture to the map
+        let uiLPGR = UILongPressGestureRecognizer(target: self, action: #selector(addPin(longGesture:)))
+        self.mapView.addGestureRecognizer(uiLPGR)
+        
         self.refresh()
     }
+    
+    /* NEED FIX: Doesnt recognize gesture here why?
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        self.mapView.removeGestureRecognizer()
+    }*/
         
     //MARK: - IBActions
         
@@ -161,26 +169,34 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
         guard let annotation = view.annotation else {
             return
         }
-        
+        let thisCoordinate = annotation.coordinate
         mapView.deselectAnnotation(annotation, animated: true)
+        
+        for pin in pins as! [Pin] {
+            if pin.latitude == thisCoordinate.latitude && pin.longitude == thisCoordinate.longitude {
+                performSegue(withIdentifier: "PhotoAlbum", sender: pin) //Sending the Pin through segue!
+            }
+        }
+        
+        /*
         // MARK: - fetch the corresponding pin that should be sent under 'sender'
         let fetchedLatitude = NSPredicate(format: "latitude = %@", annotation.coordinate.latitude)
         let fetchedLongitude = NSPredicate(format: "longitude = %@", annotation.coordinate.longitude)
         let andPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [fetchedLatitude, fetchedLongitude])
         
-        let fetchedRequestSender = NSFetchRequest<Pin>(entityName: "Pin")
+        let fetchedRequestSender = NSFetchRequest<NSManagedObject>(entityName: "Pin")
         fetchedRequestSender.predicate = andPredicate
         
         var fetchedPin: Pin
         
         do {
-            let result = try dataController.viewContext.fetch(fetchedRequestSender)
-            fetchedPin = result[0]
+            let result = try dataController.viewContext.fetch(fetchedRequestSender) as! [Pin]
+            fetchedPin = result.first!
             performSegue(withIdentifier: "PhotoAlbum", sender: fetchedPin) //Sending the Pin through segue!
             
         } catch let error as NSError {
             print("Could not fetch. \(error), \(error.userInfo)")
-        }
+        }*/
     
     }
 }
