@@ -18,25 +18,22 @@ class TravelLocationsMapViewController: UIViewController {
     
     var pins: [NSManagedObject] = []
     
-    
 //MARK: - View Life Cycle
-        
+    
     override func viewDidLoad() {
         super.viewDidLoad()
             
         //Set MapView's delegate and properties
+        // Instantiate a long press gesture to the map
+        let uiLPGR = UILongPressGestureRecognizer(target: self, action: #selector(addPin(longGesture:)))
+        self.mapView.addGestureRecognizer(uiLPGR)
+        
         self.mapView.delegate = self
         self.mapView.isZoomEnabled = true
         self.mapView.isScrollEnabled = true
         title = "Im here!"
             
-        //Fetching Pins from CoreData persistent store
-        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Pin")
-        do {
-            pins = try dataController.viewContext.fetch(fetchRequest)
-        } catch let error as NSError {
-            print("Could not fetch. \(error), \(error.userInfo)")
-        }
+        fetchPins()
                 
     }
         
@@ -58,7 +55,7 @@ class TravelLocationsMapViewController: UIViewController {
             
         var annotations = [MKPointAnnotation]()
         
-        //MARK: - TO DO: use CoreData to populate map with pins
+        //MARK: using CoreData to populate map with pins
         for dictionary in pins {
                 
             let lat = CLLocationDegrees((dictionary.value(forKeyPath: "latitude") as? Double) ?? 0.0 )
@@ -78,6 +75,34 @@ class TravelLocationsMapViewController: UIViewController {
             
         // When the array is complete, we add the annotations to the map.
         self.mapView.addAnnotations(annotations)
+    }
+    
+    fileprivate func fetchPins() {
+        //Fetching Pins from CoreData persistent store
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Pin")
+        do {
+            pins = try dataController.viewContext.fetch(fetchRequest)
+        } catch let error as NSError {
+            print("Could not fetch. \(error), \(error.userInfo)")
+        }
+    }
+    
+    @objc func addPin(longGesture: UIGestureRecognizer) {
+        
+        if longGesture.state == .began {
+        let touchedPoint = longGesture.location(in: mapView)
+        let newCoords = mapView.convert(touchedPoint, toCoordinateFrom: mapView)
+        let pressedLocation = CLLocation(latitude: newCoords.latitude, longitude: newCoords.longitude)
+        
+        let newPin = Pin(context: dataController.viewContext)
+        newPin.latitude = pressedLocation.coordinate.latitude
+        newPin.longitude = pressedLocation.coordinate.longitude
+        try? dataController.viewContext.save()
+        
+        self.fetchPins()
+        self.refresh()
+        }
+        
     }
 
 // MARK: - Navigation
@@ -118,7 +143,8 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
         return pinView
     }
     
-    // Adds new 'pin'(s) as NSManagedObject 'Pin'
+    /*
+    //MARK: - TODO: (this should work in reverse. add to Pin first and then populate) Adds new 'pin'(s) as NSManagedObject 'Pin'
     func mapView(_ mapView: MKMapView, didAdd views: [MKAnnotationView]) {
         print("User is adding a pin here")
         for addedPin in views {
@@ -127,7 +153,7 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
             newPin.longitude = addedPin.annotation?.coordinate.longitude ?? 0.0
             try? dataController.viewContext.save()
         }
-    }
+    }*/
     
     //User tapped on the pin
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
@@ -137,8 +163,25 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
         }
         
         mapView.deselectAnnotation(annotation, animated: true)
-        // MARK: - TO DO : fetch the corresponding pin that should be sent under 'sender'
-        performSegue(withIdentifier: "PhotoAlbum", sender: self)
+        // MARK: - fetch the corresponding pin that should be sent under 'sender'
+        let fetchedLatitude = NSPredicate(format: "latitude = %@", annotation.coordinate.latitude)
+        let fetchedLongitude = NSPredicate(format: "longitude = %@", annotation.coordinate.longitude)
+        let andPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [fetchedLatitude, fetchedLongitude])
+        
+        let fetchedRequestSender = NSFetchRequest<Pin>(entityName: "Pin")
+        fetchedRequestSender.predicate = andPredicate
+        
+        var fetchedPin: Pin
+        
+        do {
+            let result = try dataController.viewContext.fetch(fetchedRequestSender)
+            fetchedPin = result[0]
+            performSegue(withIdentifier: "PhotoAlbum", sender: fetchedPin) //Sending the Pin through segue!
+            
+        } catch let error as NSError {
+            print("Could not fetch. \(error), \(error.userInfo)")
+        }
+    
     }
 }
 
