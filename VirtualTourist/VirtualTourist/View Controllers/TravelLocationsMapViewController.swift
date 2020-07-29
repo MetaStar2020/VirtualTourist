@@ -14,6 +14,14 @@ class TravelLocationsMapViewController: UIViewController {
 
     @IBOutlet weak var mapView: MKMapView!
     
+    
+    //MARK: - Variables
+    fileprivate let locationManager: CLLocationManager = {
+        let manager = CLLocationManager()
+        manager.requestWhenInUseAuthorization()
+        return manager
+    }()
+    
     var dataController: DataController!
     
     var pins: [NSManagedObject] = []
@@ -23,12 +31,7 @@ class TravelLocationsMapViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
             
-        //Set MapView's delegate and properties
-        
-        self.mapView.delegate = self
-        self.mapView.isZoomEnabled = true
-        self.mapView.isScrollEnabled = true
-        title = "Im here!"
+        setUpMapView()
         
         // Instantiate a long press gesture to the map
         let uiLPGR = UILongPressGestureRecognizer(target: self, action: #selector(addPin(longGesture:)))
@@ -52,6 +55,32 @@ class TravelLocationsMapViewController: UIViewController {
     }
         
     //MARK: - Internal Class Functions
+    
+    //MARK: Setup Methods
+    private func setUpMapView() {
+        //Set MapView's delegate and properties
+        
+        self.mapView.delegate = self
+        self.mapView.isZoomEnabled = true
+        self.mapView.isScrollEnabled = true
+        title = "Travel Locations Map"
+        
+        //mapView.showsUserLocation = true
+        mapView.showsCompass = true
+        mapView.showsScale = true
+        currentLocation()
+    }
+    
+    private func currentLocation() {
+       locationManager.delegate = self
+       locationManager.desiredAccuracy = kCLLocationAccuracyBest
+       if #available(iOS 11.0, *) {
+          locationManager.showsBackgroundLocationIndicator = true
+       } else {
+          // Fallback on earlier versions
+       }
+       locationManager.startUpdatingLocation()
+    }
         
     private func setUpPins() {
             
@@ -174,6 +203,21 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
     
     }
 }
+
+extension TravelLocationsMapViewController: CLLocationManagerDelegate {
+   func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+      
+      let location = locations.last! as CLLocation
+      let currentLocation = location.coordinate
+      let coordinateRegion = MKCoordinateRegion(center: currentLocation, latitudinalMeters: 100000, longitudinalMeters: 100000)
+      mapView.setRegion(coordinateRegion, animated: true)
+      locationManager.stopUpdatingLocation()
+   }
+   func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+      print(error.localizedDescription)
+   }
+}
+
 
 
 
