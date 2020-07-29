@@ -96,9 +96,8 @@
                     </view>
                     <navigationItem key="navigationItem" id="qQV-Ky-EX1"/>
                     <connections>
-                        <outlet property="collectionView" destination="X6g-AO-27i" id="ALe-G0-Rdl"/>
                         <outlet property="mapView" destination="g9q-ol-bSt" id="ULf-16-6oT"/>
-                        <outlet property="photoCollectionView" destination="X6g-AO-27i" id="bxN-R2-3aF"/>
+                        <outlet property="photoCollectionView" destination="X6g-AO-27i" id="CaF-2e-KiN"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vSl-eK-OGu" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
