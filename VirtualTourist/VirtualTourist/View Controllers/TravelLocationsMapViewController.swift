@@ -24,10 +24,15 @@ class TravelLocationsMapViewController: UIViewController {
         super.viewDidLoad()
             
         //Set MapView's delegate and properties
+        
         self.mapView.delegate = self
         self.mapView.isZoomEnabled = true
         self.mapView.isScrollEnabled = true
         title = "Im here!"
+        
+        // Instantiate a long press gesture to the map
+        let uiLPGR = UILongPressGestureRecognizer(target: self, action: #selector(addPin(longGesture:)))
+        self.mapView.addGestureRecognizer(uiLPGR)
             
         fetchPins()
                 
@@ -36,18 +41,7 @@ class TravelLocationsMapViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        // Instantiate a long press gesture to the map
-        let uiLPGR = UILongPressGestureRecognizer(target: self, action: #selector(addPin(longGesture:)))
-        self.mapView.addGestureRecognizer(uiLPGR)
-        
         self.refresh()
-    }
-    
-    //NEED FIX: Doesnt recognize gesture here why?
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        self.mapView.removeGestureRecognizer(uiLPGR)
     }
         
     //MARK: - IBActions
