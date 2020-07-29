@@ -45,6 +45,37 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C04D622E24D1FC9400CFD0CF /* Flickr Client */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "Flickr Client";
+			sourceTree = "<group>";
+		};
+		C04D622F24D1FDE100CFD0CF /* Flickr API */ = {
+			isa = PBXGroup;
+			children = (
+				C04D622E24D1FC9400CFD0CF /* Flickr Client */,
+				C04D623124D1FE0B00CFD0CF /* Flickr Requests */,
+				C04D623024D1FDFA00CFD0CF /* Flickr Responses */,
+			);
+			path = "Flickr API";
+			sourceTree = "<group>";
+		};
+		C04D623024D1FDFA00CFD0CF /* Flickr Responses */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "Flickr Responses";
+			sourceTree = "<group>";
+		};
+		C04D623124D1FE0B00CFD0CF /* Flickr Requests */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "Flickr Requests";
+			sourceTree = "<group>";
+		};
 		C0F9BB1324CA02F200DC39F4 = {
 			isa = PBXGroup;
 			children = (
@@ -78,6 +109,7 @@
 		C0F9BB3624CA043100DC39F4 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				C04D622F24D1FDE100CFD0CF /* Flickr API */,
 				C0F9BB2824CA02F200DC39F4 /* VirtualTourist.xcdatamodeld */,
 				C0F9BB3D24CA0CC300DC39F4 /* DataController.swift */,
 			);

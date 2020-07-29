@@ -10,12 +10,13 @@ import UIKit
 import MapKit
 import CoreData
 
-class PhotoAlbumViewController: UICollectionViewController {
+class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UICollectionViewDataSource {
     
     //outlet for map here
     //outlet for colection view
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var photoCollectionView: UICollectionView!
+    
     
     let collectionCellID = "CollectionViewCell"
     
@@ -51,8 +52,10 @@ class PhotoAlbumViewController: UICollectionViewController {
         self.mapView.delegate = self
         self.mapView.isZoomEnabled = false
         self.mapView.isScrollEnabled = false
-                
-        //Retrieving Pin Location
+        
+        //Setting pin on map
+        let clLocation = CLLocation(latitude: pin.latitude, longitude: pin.longitude)
+        centerMapOnLocation(clLocation , mapView: self.mapView)
         setUpPin()
         //setupFetchedResultsController()
                     
@@ -78,6 +81,16 @@ class PhotoAlbumViewController: UICollectionViewController {
     }
             
     //MARK: - Internal Class Functions
+    
+    //Zoom in to display student's choosen location prior to finishing
+    private func centerMapOnLocation(_ location: CLLocation, mapView: MKMapView) {
+        
+        let regionRadius: CLLocationDistance = 1000
+        let coordinateRegion = MKCoordinateRegion(center: location.coordinate,
+                                                  latitudinalMeters: regionRadius * 2.0, longitudinalMeters: regionRadius * 2.0)
+        mapView.setRegion(coordinateRegion, animated: true)
+        
+    }
             
     private func setUpPin() {
                 
@@ -115,13 +128,14 @@ class PhotoAlbumViewController: UICollectionViewController {
         }
     }*/
     
-    //MARK: - Required functions for collection view
+    //MARK: - Required functions for collection view Delegate
+    //MARK: - TO DO: Make it an extension
     // Return the number of rows for the table.
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 1    }
 
     // Provide a cell object for each row.
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
        // Fetch a cell of the appropriate type.
        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: collectionCellID , for: indexPath) as! CollectionViewCell
         print(indexPath)
