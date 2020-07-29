@@ -1,5 +1,5 @@
 //
-//  CollectionCell.swift
+//  CollectionViewCell.swift
 //  VirtualTourist
 //
 //  Created by Chantal Deguire on 2020-07-29.
@@ -9,8 +9,9 @@
 import Foundation
 import UIKit
 
-class CollectionCell: UICollectionViewCell {
+class CollectionViewCell: UICollectionViewCell {
     
     // MARK: - Outlets
+    @IBOutlet var albumPhoto: UIImageView!
     
 }

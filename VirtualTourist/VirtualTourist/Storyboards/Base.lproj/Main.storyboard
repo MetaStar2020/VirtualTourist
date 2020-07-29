@@ -60,7 +60,7 @@
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="eFm-fF-eGr" customClass="CollectionCell" customModule="VirtualTourist" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" reuseIdentifier="CollectionViewCell" id="eFm-fF-eGr" customClass="CollectionCell" customModule="VirtualTourist" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="Mpd-kY-MZ0">
@@ -73,6 +73,10 @@
                                                 </imageView>
                                             </subviews>
                                         </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="albumPhoto" destination="uOb-9O-jcT" id="3Sb-Yb-QoU"/>
+                                            <outlet property="photo" destination="Mpd-kY-MZ0" id="fik-gH-XMj"/>
+                                        </connections>
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
@@ -92,8 +96,9 @@
                     </view>
                     <navigationItem key="navigationItem" id="qQV-Ky-EX1"/>
                     <connections>
-                        <outlet property="collectionView" destination="X6g-AO-27i" id="gZC-EC-o0h"/>
+                        <outlet property="collectionView" destination="X6g-AO-27i" id="ALe-G0-Rdl"/>
                         <outlet property="mapView" destination="g9q-ol-bSt" id="ULf-16-6oT"/>
+                        <outlet property="photoCollectionView" destination="X6g-AO-27i" id="bxN-R2-3aF"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vSl-eK-OGu" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
