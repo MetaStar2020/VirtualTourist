@@ -4,6 +4,7 @@
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="collection view cell content view" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -45,14 +46,59 @@
                     <view key="view" contentMode="scaleToFill" id="Q9s-p2-Svl">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="g9q-ol-bSt">
+                                <rect key="frame" x="0.0" y="88" width="414" height="225"/>
+                            </mapView>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="X6g-AO-27i">
+                                <rect key="frame" x="0.0" y="311" width="414" height="551"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="PoQ-AP-i9T">
+                                    <size key="itemSize" width="50" height="50"/>
+                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="eFm-fF-eGr" customClass="CollectionCell" customModule="VirtualTourist" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="Mpd-kY-MZ0">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uOb-9O-jcT">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                </imageView>
+                                            </subviews>
+                                        </collectionViewCellContentView>
+                                    </collectionViewCell>
+                                </cells>
+                            </collectionView>
+                        </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="g9q-ol-bSt" firstAttribute="leading" secondItem="FwI-s3-sox" secondAttribute="leading" id="1Qm-cE-PeQ"/>
+                            <constraint firstItem="X6g-AO-27i" firstAttribute="top" secondItem="FwI-s3-sox" secondAttribute="top" constant="223" id="22G-It-2Iv"/>
+                            <constraint firstItem="g9q-ol-bSt" firstAttribute="centerX" secondItem="Q9s-p2-Svl" secondAttribute="centerX" id="5Cg-Oi-WHa"/>
+                            <constraint firstItem="FwI-s3-sox" firstAttribute="bottom" secondItem="g9q-ol-bSt" secondAttribute="bottom" constant="549" id="7Sb-gQ-y4b"/>
+                            <constraint firstItem="X6g-AO-27i" firstAttribute="leading" secondItem="g9q-ol-bSt" secondAttribute="leading" id="IcN-Tu-XkP"/>
+                            <constraint firstItem="X6g-AO-27i" firstAttribute="bottom" secondItem="FwI-s3-sox" secondAttribute="bottom" id="dqv-vy-4en"/>
+                            <constraint firstItem="X6g-AO-27i" firstAttribute="trailing" secondItem="g9q-ol-bSt" secondAttribute="trailing" id="eqj-ye-Lq8"/>
+                            <constraint firstItem="g9q-ol-bSt" firstAttribute="top" secondItem="FwI-s3-sox" secondAttribute="top" id="mXu-mf-ONt"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="FwI-s3-sox"/>
                     </view>
                     <navigationItem key="navigationItem" id="qQV-Ky-EX1"/>
+                    <connections>
+                        <outlet property="collectionView" destination="X6g-AO-27i" id="gZC-EC-o0h"/>
+                        <outlet property="mapView" destination="g9q-ol-bSt" id="ULf-16-6oT"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vSl-eK-OGu" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1909" y="138"/>
+            <point key="canvasLocation" x="1908.6956521739132" y="137.94642857142856"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="KFW-9t-d1b">

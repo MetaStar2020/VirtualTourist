@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C04D622D24D1CC4E00CFD0CF /* CollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04D622C24D1CC4E00CFD0CF /* CollectionCell.swift */; };
 		C0F9BB2024CA02F200DC39F4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F9BB1F24CA02F200DC39F4 /* AppDelegate.swift */; };
 		C0F9BB2424CA02F200DC39F4 /* TravelLocationsMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F9BB2324CA02F200DC39F4 /* TravelLocationsMapViewController.swift */; };
 		C0F9BB2724CA02F200DC39F4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C0F9BB2524CA02F200DC39F4 /* Main.storyboard */; };
@@ -19,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C04D622C24D1CC4E00CFD0CF /* CollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionCell.swift; sourceTree = "<group>"; };
 		C0F9BB1C24CA02F200DC39F4 /* VirtualTourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VirtualTourist.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0F9BB1F24CA02F200DC39F4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C0F9BB2324CA02F200DC39F4 /* TravelLocationsMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelLocationsMapViewController.swift; sourceTree = "<group>"; };
@@ -103,6 +105,7 @@
 			isa = PBXGroup;
 			children = (
 				C0F9BB3F24CA120600DC39F4 /* ErrorAlertView.swift */,
+				C04D622C24D1CC4E00CFD0CF /* CollectionCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -191,6 +194,7 @@
 				C0F9BB2A24CA02F200DC39F4 /* VirtualTourist.xcdatamodeld in Sources */,
 				C0F9BB4024CA120600DC39F4 /* ErrorAlertView.swift in Sources */,
 				C0F9BB2424CA02F200DC39F4 /* TravelLocationsMapViewController.swift in Sources */,
+				C04D622D24D1CC4E00CFD0CF /* CollectionCell.swift in Sources */,
 				C0F9BB2024CA02F200DC39F4 /* AppDelegate.swift in Sources */,
 				C0F9BB3C24CA057600DC39F4 /* PhotoAlbumViewController.swift in Sources */,
 			);

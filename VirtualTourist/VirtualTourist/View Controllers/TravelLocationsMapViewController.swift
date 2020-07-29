@@ -171,35 +171,8 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
                 performSegue(withIdentifier: "PhotoAlbum", sender: pin) //Sending the Pin through segue!
             }
         }
-        
-        /*
-        // MARK: - fetch the corresponding pin that should be sent under 'sender'
-        let fetchedLatitude = NSPredicate(format: "latitude = %@", annotation.coordinate.latitude)
-        let fetchedLongitude = NSPredicate(format: "longitude = %@", annotation.coordinate.longitude)
-        let andPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [fetchedLatitude, fetchedLongitude])
-        
-        let fetchedRequestSender = NSFetchRequest<NSManagedObject>(entityName: "Pin")
-        fetchedRequestSender.predicate = andPredicate
-        
-        var fetchedPin: Pin
-        
-        do {
-            let result = try dataController.viewContext.fetch(fetchedRequestSender) as! [Pin]
-            fetchedPin = result.first!
-            performSegue(withIdentifier: "PhotoAlbum", sender: fetchedPin) //Sending the Pin through segue!
-            
-        } catch let error as NSError {
-            print("Could not fetch. \(error), \(error.userInfo)")
-        }*/
     
     }
-}
-
-//MARK: - NSFetchedResults Delegate (required?)
-
-extension TravelLocationsMapViewController: NSFetchedResultsControllerDelegate {
-    
-    // Not sure if its necessary in this case? Do I need to fetch/add to the map everytime there is a change? -- like a refresh to make sure pins are added after saved?
 }
 
 

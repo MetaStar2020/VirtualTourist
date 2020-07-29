@@ -7,18 +7,22 @@
 //
 
 import UIKit
+import MapKit
+import CoreData
 
-class PhotoAlbumViewController: UIViewController { /*
+class PhotoAlbumViewController: UIViewController {
     
     //outlet for map here
     //outlet for colection view
-*/
+    @IBOutlet weak var mapView: MKMapView!
+    //@IBOutlet weak var collectionView: UICollectionView!
+    
     var dataController: DataController!
         
-    //var fetchedResultsController: NSFetchedResultsController<Photo>!
+    var fetchedResultsController: NSFetchedResultsController<Photo>!
  
     var pin: Pin!
-    /*
+    
     var photos: [NSManagedObject] = []
         
     //MARK: - Private Functions
@@ -26,7 +30,7 @@ class PhotoAlbumViewController: UIViewController { /*
     fileprivate func setupFetchedResultsController() {
         let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
               
-        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "pins")
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "photos")
         fetchedResultsController.delegate = self
         do {
             try fetchedResultsController.performFetch()
@@ -42,44 +46,44 @@ class PhotoAlbumViewController: UIViewController { /*
                 
         //Set MapView's delegate and properties
         self.mapView.delegate = self
-        self.mapView.isZoomEnabled = true
-        self.mapView.isScrollEnabled = true
-        title = "Im here!"
+        self.mapView.isZoomEnabled = false
+        self.mapView.isScrollEnabled = false
                 
-        //Retrieving Pin Locations
-        setupFetchedResultsController()
+        //Retrieving Pin Location
+        setUpPin()
+        //setupFetchedResultsController()
                     
     }
-            
+        
+    /*
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setupFetchedResultsController()
         self.refresh()
-    }
+    }*/
         
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        fetchedResultsController = nil
+        //fetchedResultsController = nil
     }
             
     //MARK: - IBActions
             
     private func refresh() {
         self.mapView.removeAnnotations(mapView.annotations)
-        self.setUpPins()
+        self.setUpPin()
     }
             
     //MARK: - Internal Class Functions
             
-    private func setUpPins() {
+    private func setUpPin() {
                 
         var annotations = [MKPointAnnotation]()
             
-        //MARK: - TO DO: use CoreData to populate map with pins
-        for dictionary in pins {
+        //MARK: - Using CoreData to populate map with the pin
                     
-            let lat = CLLocationDegrees((dictionary.value(forKeyPath: "latitude") as? Double) ?? 0.0 )
-            let long = CLLocationDegrees((dictionary.value(forKeyPath: "longitude") as? Double) ?? 0.0 )
+            let lat = CLLocationDegrees((pin.value(forKeyPath: "latitude") as? Double) ?? 0.0 )
+            let long = CLLocationDegrees((pin.value(forKeyPath: "longitude") as? Double) ?? 0.0 )
                     
             // The lat and long are used to create a CLLocationCoordinates2D instance.
             let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: long)
@@ -91,7 +95,6 @@ class PhotoAlbumViewController: UIViewController { /*
             // Adding the annotation in an array of annotations.
             annotations.append(annotation)
                     
-        }
                 
         // When the array is complete, we add the annotations to the map.
         self.mapView.addAnnotations(annotations)
@@ -99,21 +102,21 @@ class PhotoAlbumViewController: UIViewController { /*
 
     // MARK: - Navigation
 
+    /*
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // If this is a NotesListViewController, we'll configure its `Notebook`
-        if let vc = segue.destination as? PhotoAlbumViewController {
-            if let indexPath = tableView.indexPathForSelectedRow {
-                vc.notebook = fetchedResultsController.object(at: indexPath)
+    
+        if let vc = segue.destination as? TravelLocationsMapViewController {
+            
                 vc.dataController = dataController
-            }
+    
         }
     }*/
 }
 
-/*
+
 // MARK: - MKMapViewDelegate Funtions (required)
 
-extension TravelLocationsMapViewController: MKMapViewDelegate {
+extension PhotoAlbumViewController: MKMapViewDelegate {
 
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
             
@@ -133,29 +136,22 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
             
         return pinView
     }
-
-        
-    // This delegate method is implemented to respond to taps. It opens the system browser
-    // to the URL specified in the annotationViews subtitle property.
-    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
-        if control == view.rightCalloutAccessoryView {
-            if let mediaURL = view.annotation?.subtitle! {
-                if mediaURL.contains("https"){
-                    if let mediaURL = URL(string: mediaURL){
-                        UIApplication.shared.open(mediaURL, options: [:], completionHandler: nil)
-                    }
-                } else {
-                    ErrorAlertView.showMessage(title: "Incorrect URL Format", msg: "Media contains a wrong URL format", on: self)
-                }
-            }
-        }
-    }
 }
 
 //MARK: - NSFetchedResults Delegate (required?)
 
-extension TravelLocationsMapViewController: NSFetchedResultsControllerDelegate {
+extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
         
-    // Not sure if its necessary in this case? Do I need to fetch/add to the map everytime there is a change? -- like a refresh to make sure pins are added after saved?
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        
+    }
+        
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        //beginINteractionMovement....
+    }
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        //endInteractionMovement
+    }
 }
-*/
+
