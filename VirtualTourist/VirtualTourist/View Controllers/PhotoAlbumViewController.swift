@@ -16,9 +16,17 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     //outlet for colection view
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var photoCollectionView: UICollectionView!
+    @IBOutlet weak var noImage: UIImageView!
     
     
     let collectionCellID = "CollectionViewCell"
+    
+    private let itemsPerRow: CGFloat = 3
+    
+    private let sectionInsets = UIEdgeInsets(top: 50.0,
+    left: 20.0,
+    bottom: 50.0,
+    right: 20.0)
     
     var dataController: DataController!
         
@@ -32,6 +40,10 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         
     fileprivate func setupFetchedResultsController() {
         let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
+        let predicate = NSPredicate(format: "pin == %@", pin)
+        fetchRequest.predicate = predicate
+        
+        fetchRequest.sortDescriptors = []
               
         fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "photos")
         fetchedResultsController.delegate = self
@@ -57,7 +69,10 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         let clLocation = CLLocation(latitude: pin.latitude, longitude: pin.longitude)
         centerMapOnLocation(clLocation , mapView: self.mapView)
         setUpPin()
-        //setupFetchedResultsController()
+        
+        //Setting Collection View
+        noImage.isHidden = true
+        setupFetchedResultsController()
                     
     }
         
@@ -130,21 +145,46 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     
     //MARK: - Required functions for collection view Delegate
     //MARK: - TO DO: Make it an extension
-    // Return the number of rows for the table.
+    // Return the number of sections in the collection view
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 1    }
+        print(section)
+        return fetchedResultsController.sections?.count ?? 1
+    }
+    
+    //Provides the number of object per section(s)
+    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        let sectionInfo = self.fetchedResultsController.sections![section]
+        print(sectionInfo.numberOfObjects)
+        (sectionInfo.numberOfObjects == 0 ? (noImage.isHidden = false) : (noImage.isHidden = true) )
+        return sectionInfo.numberOfObjects
+    }
 
-    // Provide a cell object for each row.
+    // Populate the cells
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
        // Fetch a cell of the appropriate type.
-       let cell = collectionView.dequeueReusableCell(withReuseIdentifier: collectionCellID , for: indexPath) as! CollectionViewCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: collectionCellID , for: indexPath) as! CollectionViewCell
         print(indexPath)
+        let cellPhoto = fetchedResultsController.object(at: indexPath)
        
+        
        // Configure the cell’s contents.
-       //cell.collectionView.albumPhoto = self.memes[indexPath.row].originalImage
+        configureUI(cell: cell, photo: cellPhoto, atIndexPath: indexPath)
         
        return cell
     }
+    
+    func configureUI(cell: CollectionViewCell, photo: Photo, atIndexPath indexPath: IndexPath) {
+
+        if photo.image != nil{
+            noImage.isHidden = true
+            cell.albumPhoto.image = UIImage(data: Data(referencing: photo.image! as NSData))
+            print("Image.image \(photo.image!)")
+        }else{
+            print("photo is nil")
+            //noImage.isHidden = false
+        }
+    }
+
 }
 
 
@@ -188,4 +228,35 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
         //endInteractionMovement
     }
 }
+
+// MARK: - Collection View Flow Layout Delegate
+extension PhotoAlbumViewController : UICollectionViewDelegateFlowLayout {
+  
+  func collectionView(_ collectionView: UICollectionView,
+                      layout collectionViewLayout: UICollectionViewLayout,
+                      sizeForItemAt indexPath: IndexPath) -> CGSize {
+    
+    let paddingSpace = sectionInsets.left * (itemsPerRow + 1)
+    let availableWidth = view.frame.width - paddingSpace
+    let widthPerItem = availableWidth / itemsPerRow
+    
+    return CGSize(width: widthPerItem, height: widthPerItem)
+  }
+  
+  
+  func collectionView(_ collectionView: UICollectionView,
+                      layout collectionViewLayout: UICollectionViewLayout,
+                      insetForSectionAt section: Int) -> UIEdgeInsets {
+    return sectionInsets
+  }
+  
+  
+  func collectionView(_ collectionView: UICollectionView,
+                      layout collectionViewLayout: UICollectionViewLayout,
+                      minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+    return sectionInsets.left
+  }
+}
+
+
 
