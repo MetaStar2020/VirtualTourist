@@ -71,6 +71,8 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         setUpPin()
         
         //Setting Collection View
+        photoCollectionView.delegate = self
+        photoCollectionView.dataSource = self
         noImage.isHidden = true
         setupFetchedResultsController()
                     
@@ -218,14 +220,36 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
         
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         
-    }
+        photoCollectionView.beginInteractiveMovementForItem(at: indexPath!)
         
+        switch type {
+            case .insert:
+                photoCollectionView.insertItems(at: [indexPath!])
+                break
+            case .delete:
+                photoCollectionView.deleteItems(at: [indexPath!])
+                break
+            case .update:
+                photoCollectionView.reloadItems(at: [indexPath!])
+                break
+            case .move:
+                photoCollectionView.moveItem(at: indexPath!, to: newIndexPath!)
+                break
+        
+            @unknown default:
+                fatalError("Invalid change type in controller(_:didChange:atSectionIndex:for:). Only .insert/delete/move/update should be possible.")
+        }
+        
+    }
+    
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         //beginINteractionMovement....
+        
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         //endInteractionMovement
+        photoCollectionView.endInteractiveMovement()
     }
 }
 
