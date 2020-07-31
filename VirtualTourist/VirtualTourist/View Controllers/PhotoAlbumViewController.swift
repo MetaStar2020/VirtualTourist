@@ -21,8 +21,6 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     
     let collectionCellID = "CollectionViewCell"
     
-    private let itemsPerRow: CGFloat = 3.0
-    
     private let sectionInsets = UIEdgeInsets(top: 0.0,
     left: 0.0,
     bottom: 0.0,
@@ -221,7 +219,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     }
     
     func configureUI(cell: CollectionViewCell, photo: Photo, atIndexPath indexPath: IndexPath) {
-
+        
         if photo.imageData != nil{
             noImage.isHidden = true
             cell.albumPhoto.image = UIImage(data: Data(referencing: photo.imageData! as NSData))
@@ -307,8 +305,9 @@ extension PhotoAlbumViewController : UICollectionViewDelegateFlowLayout {
                       layout collectionViewLayout: UICollectionViewLayout,
                       sizeForItemAt indexPath: IndexPath) -> CGSize {
     
+    let itemsPerRow: CGFloat = self.view.frame.size.width > self.view.frame.size.height ? 5.0 : 3.0
     let paddingSpace = sectionInsets.left * (itemsPerRow + 1)
-    let availableWidth = view.frame.width - paddingSpace
+    let availableWidth = self.view.frame.size.width - paddingSpace
     let widthPerItem = availableWidth / itemsPerRow
     
     return CGSize(width: widthPerItem, height: widthPerItem)
