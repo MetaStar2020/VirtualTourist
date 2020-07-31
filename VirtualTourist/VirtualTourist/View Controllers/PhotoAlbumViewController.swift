@@ -148,15 +148,19 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     //MARK: - Required functions for collection view Delegate
     //MARK: - TO DO: Make it an extension
     // Return the number of sections in the collection view
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        print(section)
+    /*func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        print("scetion:\(section)")
+        return fetchedResultsController.sections?.count ?? 1
+    }*/
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
         return fetchedResultsController.sections?.count ?? 1
     }
     
     //Provides the number of object per section(s)
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let sectionInfo = self.fetchedResultsController.sections![section]
-        print(sectionInfo.numberOfObjects)
+        print("sectionInfo.numberOfObjects\(sectionInfo.numberOfObjects)")
         (sectionInfo.numberOfObjects == 0 ? (noImage.isHidden = false) : (noImage.isHidden = true) )
         return sectionInfo.numberOfObjects
     }
@@ -165,12 +169,13 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
        // Fetch a cell of the appropriate type.
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: collectionCellID , for: indexPath) as! CollectionViewCell
-        print(indexPath)
-        let cellPhoto = fetchedResultsController.object(at: indexPath)
-       
+        print("indexPath:\(indexPath)")
         
-       // Configure the cell’s contents.
-        configureUI(cell: cell, photo: cellPhoto, atIndexPath: indexPath)
+        if photos != [] {
+            let cellPhoto = fetchedResultsController.object(at: indexPath)
+            // Configure the cell’s contents.
+            configureUI(cell: cell, photo: cellPhoto, atIndexPath: indexPath)
+        }
         
        return cell
     }

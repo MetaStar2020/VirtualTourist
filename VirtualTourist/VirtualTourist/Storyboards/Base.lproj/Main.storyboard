@@ -64,7 +64,7 @@
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 </imageView>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" reuseIdentifier="CollectionViewCell" id="eFm-fF-eGr" customClass="CollectionCell" customModule="VirtualTourist" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" reuseIdentifier="CollectionViewCell" id="eFm-fF-eGr" customClass="CollectionViewCell" customModule="VirtualTourist" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="Mpd-kY-MZ0">
@@ -78,8 +78,7 @@
                                             </subviews>
                                         </collectionViewCellContentView>
                                         <connections>
-                                            <outlet property="albumPhoto" destination="uOb-9O-jcT" id="3Sb-Yb-QoU"/>
-                                            <outlet property="photo" destination="Mpd-kY-MZ0" id="fik-gH-XMj"/>
+                                            <outlet property="albumPhoto" destination="uOb-9O-jcT" id="Fud-xj-pXS"/>
                                         </connections>
                                     </collectionViewCell>
                                 </cells>
