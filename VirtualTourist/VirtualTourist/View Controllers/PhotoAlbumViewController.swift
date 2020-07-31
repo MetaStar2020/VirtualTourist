@@ -34,7 +34,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
  
     var pin: Pin!
     
-    var photos: [NSManagedObject] = []
+    //var photos: [NSManagedObject] = []
         
     //MARK: - Private Functions
         
@@ -66,6 +66,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         self.mapView.isScrollEnabled = false
         
         //Setting pin on map
+        print("pin's lat\(pin.latitude) and pin's long: \(pin.longitude)")
         let clLocation = CLLocation(latitude: pin.latitude, longitude: pin.longitude)
         centerMapOnLocation(clLocation , mapView: self.mapView)
         setUpPin()
@@ -75,29 +76,56 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         photoCollectionView.dataSource = self
         noImage.isHidden = true
         setupFetchedResultsController()
+        
+        //refactor this with activity indicator and loading images
+        if (fetchedResultsController.fetchedObjects!.isEmpty == true) {
+            FlickrClient.search(lat: pin!.latitude, long: pin!.longitude) { flickrPhotos, error in
+                
+                for photo in flickrPhotos {
+                    print("this is flickr photo: \(flickrPhotos)")
+                    FlickrClient.downloadPosterImage(photo: photo, completion: self.handleDownload(data:error:))
+                }
+                
+            }
+            
+        }
                     
     }
         
-    /*
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setupFetchedResultsController()
-        self.refresh()
-    }*/
+        //self.refresh()
+    }
         
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        //fetchedResultsController = nil
+        fetchedResultsController = nil
     }
             
-    //MARK: - IBActions
+    /*//MARK: - IBActions
             
     private func refresh() {
         self.mapView.removeAnnotations(mapView.annotations)
         self.setUpPin()
-    }
+    }*/
             
     //MARK: - Internal Class Functions
+    
+    //Retrieving Photos from Flickr
+    func handleDownload(data: Data?, error: Error?) {
+        if error == nil {
+            print("error in downloading data from a photo")
+        } else {
+            if data != nil {
+                let photo = Photo(context: dataController.viewContext)
+                photo.imageData = data
+                try? dataController.viewContext.save()
+                print("one photo is saved")
+            }
+        }
+    }
     
     //Zoom in to display student's choosen location prior to finishing
     private func centerMapOnLocation(_ location: CLLocation, mapView: MKMapView) {
@@ -113,7 +141,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
                 
         var annotations = [MKPointAnnotation]()
             
-        //MARK: - Using CoreData to populate map with the pin
+        //MARK: Using CoreData to populate map with the pin
                     
         let lat = CLLocationDegrees((pin.value(forKeyPath: "latitude") as? Double) ?? 0.0 )
         let long = CLLocationDegrees((pin.value(forKeyPath: "longitude") as? Double) ?? 0.0 )
@@ -160,7 +188,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     //Provides the number of object per section(s)
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let sectionInfo = self.fetchedResultsController.sections![section]
-        print("sectionInfo.numberOfObjects\(sectionInfo.numberOfObjects)")
+        print("sectionInfo.numberOfObjects\(sectionInfo.numberOfObjects)and sectionInfo: \(self.fetchedResultsController.sections!)")
         (sectionInfo.numberOfObjects == 0 ? (noImage.isHidden = false) : (noImage.isHidden = true) )
         return sectionInfo.numberOfObjects
     }
@@ -171,21 +199,21 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: collectionCellID , for: indexPath) as! CollectionViewCell
         print("indexPath:\(indexPath)")
         
-        if photos != [] {
+        if fetchedResultsController.fetchedObjects != nil {
             let cellPhoto = fetchedResultsController.object(at: indexPath)
             // Configure the cell’s contents.
             configureUI(cell: cell, photo: cellPhoto, atIndexPath: indexPath)
-        }
+        } else { print("fetchedObjects = nil") }
         
        return cell
     }
     
     func configureUI(cell: CollectionViewCell, photo: Photo, atIndexPath indexPath: IndexPath) {
 
-        if photo.image != nil{
+        if photo.imageData != nil{
             noImage.isHidden = true
-            cell.albumPhoto.image = UIImage(data: Data(referencing: photo.image! as NSData))
-            print("Image.image \(photo.image!)")
+            cell.albumPhoto.image = UIImage(data: Data(referencing: photo.imageData! as NSData))
+            print("Image.image \(photo.imageData!)")
         }else{
             print("photo is nil")
             //noImage.isHidden = false

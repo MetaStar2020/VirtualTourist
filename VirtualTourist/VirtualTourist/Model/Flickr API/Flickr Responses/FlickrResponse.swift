@@ -23,7 +23,7 @@ struct FlickrResponse: Codable {
 struct PhotosResponse: Codable {
     
     let page: Int
-    let pages: String
+    let pages: Int
     let perPage: Int
     let total: String
     let photo: [FlickrPhoto]
