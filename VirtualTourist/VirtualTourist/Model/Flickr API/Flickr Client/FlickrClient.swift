@@ -31,7 +31,7 @@ class FlickrClient {
             case .search(let lat, let long):
                 return Endpoints.base + Endpoints.apiKeyParam + Endpoints.flickrQuery + "&lat=\(lat)&lon=\(long)&format=json&nojsoncallback=1"
             case .photoPath(let farm, let server, let id, let secret):
-                return "http://farm\(farm).static.flickr.com/\(server)/\(id)_\(secret).jpg"
+                return "https://farm\(farm).static.flickr.com/\(server)/\(id)_\(secret).jpg"
             }
         }
         

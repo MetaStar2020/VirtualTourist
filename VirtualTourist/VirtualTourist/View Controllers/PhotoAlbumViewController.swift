@@ -21,12 +21,14 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     
     let collectionCellID = "CollectionViewCell"
     
-    private let itemsPerRow: CGFloat = 3
+    private let itemsPerRow: CGFloat = 3.0
     
-    private let sectionInsets = UIEdgeInsets(top: 50.0,
-    left: 20.0,
-    bottom: 50.0,
-    right: 20.0)
+    private let sectionInsets = UIEdgeInsets(top: 0.0,
+    left: 0.0,
+    bottom: 0.0,
+    right: 0.0)
+    
+    private var blockOperation = BlockOperation()
     
     var dataController: DataController!
         
@@ -87,7 +89,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
                 }
                 
             }
-            
+            setupFetchedResultsController()
         }
                     
     }
@@ -115,14 +117,18 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     
     //Retrieving Photos from Flickr
     func handleDownload(data: Data?, error: Error?) {
-        if error == nil {
+        if error != nil {
             print("error in downloading data from a photo")
         } else {
             if data != nil {
+                //print(String(decoding: data!, as: UTF8.self ))
                 let photo = Photo(context: dataController.viewContext)
                 photo.imageData = data
+                photo.pin = self.pin
                 try? dataController.viewContext.save()
                 print("one photo is saved")
+                
+                self.photoCollectionView.reloadData()
             }
         }
     }
@@ -208,6 +214,12 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
        return cell
     }
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let objectToDelete = fetchedResultsController.object(at: indexPath)
+        dataController.viewContext.delete(objectToDelete)
+        try? dataController.viewContext.save()
+    }
+    
     func configureUI(cell: CollectionViewCell, photo: Photo, atIndexPath indexPath: IndexPath) {
 
         if photo.imageData != nil{
@@ -253,20 +265,23 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
         
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         
-        photoCollectionView.beginInteractiveMovementForItem(at: indexPath!)
+        //photoCollectionView.beginInteractiveMovementForItem(at: indexPath!)
         
         switch type {
             case .insert:
-                photoCollectionView.insertItems(at: [indexPath!])
-                break
+                guard let newIndexPath = newIndexPath else {break}
+                photoCollectionView.insertItems(at: [newIndexPath])
             case .delete:
-                photoCollectionView.deleteItems(at: [indexPath!])
+                guard let indexPath = indexPath else {break}
+                photoCollectionView.deleteItems(at: [indexPath])
                 break
             case .update:
-                photoCollectionView.reloadItems(at: [indexPath!])
+                guard let indexPath = indexPath else {break}
+                photoCollectionView.reloadItems(at: [indexPath])
                 break
             case .move:
-                photoCollectionView.moveItem(at: indexPath!, to: newIndexPath!)
+                guard let newIndexPath = newIndexPath else {break}
+                photoCollectionView.moveItem(at: indexPath!, to: newIndexPath)
                 break
         
             @unknown default:
@@ -276,13 +291,12 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
     }
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        //beginINteractionMovement....
+        blockOperation = BlockOperation()
         
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        //endInteractionMovement
-        photoCollectionView.endInteractiveMovement()
+        photoCollectionView?.performBatchUpdates({self.blockOperation.start()}, completion: nil)
     }
 }
 
@@ -313,6 +327,7 @@ extension PhotoAlbumViewController : UICollectionViewDelegateFlowLayout {
                       minimumLineSpacingForSectionAt section: Int) -> CGFloat {
     return sectionInsets.left
   }
+    
 }
 
 
