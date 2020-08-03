@@ -19,13 +19,14 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     @IBOutlet weak var noImage: UIImageView!
     @IBOutlet weak var photoFlowLayout: UICollectionViewFlowLayout!
     
-    
     let collectionCellID = "CollectionViewCell"
     
     private let sectionInsets = UIEdgeInsets(top: 5.0,
     left: 5.0,
     bottom: 50.0,
     right: 5.0)
+    
+    let actInd: UIActivityIndicatorView = UIActivityIndicatorView()
     
     var frameSize: CGSize = CGSize(width: 300.0, height: 300.0)
     
@@ -84,10 +85,12 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         //photoFlowLayout.itemSize = frameSize
         
         noImage.isHidden = true
+        self.showActivityIndicator(uiView: noImage)
         setupFetchedResultsController()
         
         //refactor this with activity indicator and loading images
         if (fetchedResultsController.fetchedObjects!.isEmpty == true) {
+            actInd.startAnimating()
             FlickrClient.search(lat: pin!.latitude, long: pin!.longitude) { flickrPhotos, error in
                 
                 for photo in flickrPhotos {
@@ -122,6 +125,15 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
             
     //MARK: - Internal Class Functions
     
+    //Setting up the activity Indicator programmically - storyboard won't allow overlap
+    func showActivityIndicator(uiView: UIView) {
+        actInd.frame = CGRect(x: 0.0, y: 0.0, width: 40.0, height: 40.0)
+        actInd.center = uiView.center
+        actInd.hidesWhenStopped = true
+        actInd.style = UIActivityIndicatorView.Style.large
+        uiView.addSubview(actInd)
+    }
+    
     //Retrieving Photos from Flickr
     func handleDownload(data: Data?, error: Error?) {
         if error != nil {
@@ -132,10 +144,11 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
                 let photo = Photo(context: dataController.viewContext)
                 photo.imageData = data
                 photo.pin = self.pin
-                try? dataController.viewContext.save()
-                print("one photo is saved")
                 
                 self.photoCollectionView.reloadData()
+                try? dataController.viewContext.save()
+                print("one photo is saved")
+                actInd.stopAnimating()
             }
         }
     }
@@ -319,6 +332,7 @@ extension PhotoAlbumViewController : UICollectionViewDelegateFlowLayout {
     let paddingSpace = sectionInsets.left * (itemsPerRow + 1)
     let availableWidth = UIScreen.main.bounds.width - paddingSpace
     let widthPerItem = availableWidth / itemsPerRow
+    
     frameSize = CGSize(width: widthPerItem, height: widthPerItem)
     
     return frameSize
