@@ -17,14 +17,17 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var photoCollectionView: UICollectionView!
     @IBOutlet weak var noImage: UIImageView!
+    @IBOutlet weak var photoFlowLayout: UICollectionViewFlowLayout!
     
     
     let collectionCellID = "CollectionViewCell"
     
-    private let sectionInsets = UIEdgeInsets(top: 0.0,
-    left: 0.0,
-    bottom: 0.0,
-    right: 0.0)
+    private let sectionInsets = UIEdgeInsets(top: 5.0,
+    left: 5.0,
+    bottom: 50.0,
+    right: 5.0)
+    
+    var frameSize: CGSize = CGSize(width: 300.0, height: 300.0)
     
     private var blockOperation = BlockOperation()
     
@@ -74,6 +77,12 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         //Setting Collection View
         photoCollectionView.delegate = self
         photoCollectionView.dataSource = self
+        //photoCollectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: "CollectionViewCell")
+        
+        photoFlowLayout.scrollDirection = .vertical
+        self.photoCollectionView.collectionViewLayout = self.photoFlowLayout
+        //photoFlowLayout.itemSize = frameSize
+        
         noImage.isHidden = true
         setupFetchedResultsController()
         
@@ -202,6 +211,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
        // Fetch a cell of the appropriate type.
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: collectionCellID , for: indexPath) as! CollectionViewCell
         print("indexPath:\(indexPath)")
+        //cell.sizeThatFits(frameSize)
         
         if fetchedResultsController.fetchedObjects != nil {
             let cellPhoto = fetchedResultsController.object(at: indexPath)
@@ -304,13 +314,14 @@ extension PhotoAlbumViewController : UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView,
                       layout collectionViewLayout: UICollectionViewLayout,
                       sizeForItemAt indexPath: IndexPath) -> CGSize {
-    
-    let itemsPerRow: CGFloat = self.view.frame.size.width > self.view.frame.size.height ? 5.0 : 3.0
+
+    let itemsPerRow: CGFloat = UIScreen.main.bounds.width > UIScreen.main.bounds.height ? 5.0 : 3.0
     let paddingSpace = sectionInsets.left * (itemsPerRow + 1)
-    let availableWidth = self.view.frame.size.width - paddingSpace
+    let availableWidth = UIScreen.main.bounds.width - paddingSpace
     let widthPerItem = availableWidth / itemsPerRow
+    frameSize = CGSize(width: widthPerItem, height: widthPerItem)
     
-    return CGSize(width: widthPerItem, height: widthPerItem)
+    return frameSize
   }
   
   
@@ -319,6 +330,11 @@ extension PhotoAlbumViewController : UICollectionViewDelegateFlowLayout {
                       insetForSectionAt section: Int) -> UIEdgeInsets {
     return sectionInsets
   }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        
+        return sectionInsets.left
+    }
   
   
   func collectionView(_ collectionView: UICollectionView,
