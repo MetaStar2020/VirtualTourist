@@ -100,6 +100,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
                 
             }
             setupFetchedResultsController()
+            self.photoCollectionView.reloadData()
         }
                     
     }
@@ -145,7 +146,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
                 photo.imageData = data
                 photo.pin = self.pin
                 
-                self.photoCollectionView.reloadData()
+                //self.photoCollectionView.reloadData()
                 try? dataController.viewContext.save()
                 print("one photo is saved")
                 actInd.stopAnimating()
