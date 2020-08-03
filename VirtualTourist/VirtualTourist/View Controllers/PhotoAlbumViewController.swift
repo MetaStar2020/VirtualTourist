@@ -18,6 +18,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     @IBOutlet weak var photoCollectionView: UICollectionView!
     @IBOutlet weak var noImage: UIImageView!
     @IBOutlet weak var photoFlowLayout: UICollectionViewFlowLayout!
+    @IBOutlet weak var newCollectionButton: UIButton!
     
     let collectionCellID = "CollectionViewCell"
     
@@ -57,9 +58,26 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
             fatalError("The fetch could not be performed: \(error.localizedDescription)")
         }
     }
+    
         
     //MARK: - View Life Cycle
             
+    fileprivate func fetchFlickrPhotos() {
+        actInd.startAnimating()
+        newCollectionButton.isEnabled = false
+        FlickrClient.search(lat: pin!.latitude, long: pin!.longitude) { flickrPhotos, error in
+            
+            for photo in flickrPhotos {
+                print("this is flickr photo: \(flickrPhotos)")
+                FlickrClient.downloadPosterImage(photo: photo, completion: self.handleDownload(data:error:))
+            }
+            
+        }
+        setupFetchedResultsController()
+        self.photoCollectionView.reloadData()
+        newCollectionButton.isEnabled = true
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
                 
@@ -90,17 +108,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         
         //refactor this with activity indicator and loading images
         if (fetchedResultsController.fetchedObjects!.isEmpty == true) {
-            actInd.startAnimating()
-            FlickrClient.search(lat: pin!.latitude, long: pin!.longitude) { flickrPhotos, error in
-                
-                for photo in flickrPhotos {
-                    print("this is flickr photo: \(flickrPhotos)")
-                    FlickrClient.downloadPosterImage(photo: photo, completion: self.handleDownload(data:error:))
-                }
-                
-            }
-            setupFetchedResultsController()
-            self.photoCollectionView.reloadData()
+            fetchFlickrPhotos()
         }
                     
     }
@@ -117,12 +125,33 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         fetchedResultsController = nil
     }
             
-    /*//MARK: - IBActions
-            
-    private func refresh() {
-        self.mapView.removeAnnotations(mapView.annotations)
-        self.setUpPin()
-    }*/
+    //MARK: - IBActions
+     
+     @IBAction func fetchNewCollection(_ sender: UIButton) {
+        
+        /*
+        let deleteCollection = NSBatchDeleteRequest(fetchRequest: fetchedResultsController!.fetchRequest as! NSFetchRequest<NSFetchRequestResult>)
+        try? dataController.viewContext.execute(deleteCollection)
+        */
+        
+        if let  objects = fetchedResultsController.fetchedObjects {
+            //MARK: - TODO: trying to hide the cells temporarily might need to review BlockOperation and how to cell.contentView.isHidden until the batch is complete. this way we can see the activity indicator. 
+        
+            actInd.startAnimating()
+            for object in objects{
+                dataController.viewContext.performAndWait {
+                    dataController.viewContext.delete(object)
+                    try? dataController.viewContext.save()
+                }
+            }
+        }
+        self.photoCollectionView.reloadData()
+        photoCollectionView!.numberOfItems(inSection: 0)
+        dataController.viewContext.refreshAllObjects()
+        try? dataController.viewContext.save()
+        print("Now going to fetch new photos")
+        fetchFlickrPhotos()
+     }
             
     //MARK: - Internal Class Functions
     
@@ -132,7 +161,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         actInd.center = uiView.center
         actInd.hidesWhenStopped = true
         actInd.style = UIActivityIndicatorView.Style.large
-        uiView.addSubview(actInd)
+        uiView.superview!.addSubview(actInd)
     }
     
     //Retrieving Photos from Flickr
@@ -288,6 +317,7 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         
         //photoCollectionView.beginInteractiveMovementForItem(at: indexPath!)
+        
         
         switch type {
             case .insert:

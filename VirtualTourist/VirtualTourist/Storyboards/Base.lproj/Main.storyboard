@@ -51,7 +51,7 @@
                                 <rect key="frame" x="0.0" y="88" width="414" height="225"/>
                             </mapView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="X6g-AO-27i">
-                                <rect key="frame" x="0.0" y="311" width="414" height="551"/>
+                                <rect key="frame" x="0.0" y="311" width="414" height="507"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="PoQ-AP-i9T">
                                     <size key="itemSize" width="226" height="200"/>
@@ -60,7 +60,7 @@
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <imageView key="backgroundView" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.5" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="noImage" id="YGf-3N-Fne">
-                                    <rect key="frame" x="0.0" y="0.0" width="414" height="551"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="507"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 </imageView>
                                 <cells>
@@ -84,6 +84,23 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OyH-rk-Sfr">
+                                <rect key="frame" x="0.0" y="818" width="414" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <items>
+                                    <barButtonItem style="plain" id="9mV-Vs-k6w">
+                                        <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="rwc-lc-EoR">
+                                            <rect key="frame" x="20" y="1.5" width="374" height="41"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                            <state key="normal" title="New Collection"/>
+                                            <connections>
+                                                <action selector="fetchNewCollection:" destination="LfJ-HQ-DuJ" eventType="touchUpInside" id="SLu-L0-wub"/>
+                                            </connections>
+                                        </button>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
@@ -92,7 +109,7 @@
                             <constraint firstItem="g9q-ol-bSt" firstAttribute="centerX" secondItem="Q9s-p2-Svl" secondAttribute="centerX" id="5Cg-Oi-WHa"/>
                             <constraint firstItem="FwI-s3-sox" firstAttribute="bottom" secondItem="g9q-ol-bSt" secondAttribute="bottom" constant="549" id="7Sb-gQ-y4b"/>
                             <constraint firstItem="X6g-AO-27i" firstAttribute="leading" secondItem="g9q-ol-bSt" secondAttribute="leading" id="IcN-Tu-XkP"/>
-                            <constraint firstItem="X6g-AO-27i" firstAttribute="bottom" secondItem="FwI-s3-sox" secondAttribute="bottom" id="dqv-vy-4en"/>
+                            <constraint firstItem="X6g-AO-27i" firstAttribute="bottom" secondItem="FwI-s3-sox" secondAttribute="bottom" constant="-44" id="dqv-vy-4en"/>
                             <constraint firstItem="X6g-AO-27i" firstAttribute="trailing" secondItem="g9q-ol-bSt" secondAttribute="trailing" id="eqj-ye-Lq8"/>
                             <constraint firstItem="g9q-ol-bSt" firstAttribute="top" secondItem="FwI-s3-sox" secondAttribute="top" id="mXu-mf-ONt"/>
                         </constraints>
@@ -101,6 +118,7 @@
                     <navigationItem key="navigationItem" id="qQV-Ky-EX1"/>
                     <connections>
                         <outlet property="mapView" destination="g9q-ol-bSt" id="ULf-16-6oT"/>
+                        <outlet property="newCollectionButton" destination="rwc-lc-EoR" id="eyD-S8-GB1"/>
                         <outlet property="noImage" destination="YGf-3N-Fne" id="Pfp-3j-epz"/>
                         <outlet property="photoCollectionView" destination="X6g-AO-27i" id="CaF-2e-KiN"/>
                         <outlet property="photoFlowLayout" destination="PoQ-AP-i9T" id="kkQ-UW-Uga"/>
