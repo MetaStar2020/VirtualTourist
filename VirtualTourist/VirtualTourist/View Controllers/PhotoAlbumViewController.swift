@@ -135,8 +135,15 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         */
         
         if let  objects = fetchedResultsController.fetchedObjects {
-            //MARK: - TODO: trying to hide the cells temporarily might need to review BlockOperation and how to cell.contentView.isHidden until the batch is complete. this way we can see the activity indicator. 
-        
+            //MARK: - TODO: trying to hide the cells temporarily might need to review BlockOperation and how to cell.contentView.isHidden until the batch is complete. this way we can see the activity indicator.
+            let photosToDelete = photoCollectionView.indexPathsForVisibleItems
+            
+            //photoCollectionView.deleteItems(at: photosToDelete)
+            
+            for photoToDelete in photosToDelete {
+                photoCollectionView.cellForItem(at: photoToDelete)!.isHidden = true
+            }
+            
             actInd.startAnimating()
             for object in objects{
                 dataController.viewContext.performAndWait {
@@ -322,19 +329,24 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
         switch type {
             case .insert:
                 guard let newIndexPath = newIndexPath else {break}
-                photoCollectionView.insertItems(at: [newIndexPath])
+                blockOperation.addExecutionBlock {
+                    self.photoCollectionView.insertItems(at: [newIndexPath])
+                }
             case .delete:
                 guard let indexPath = indexPath else {break}
-                photoCollectionView.deleteItems(at: [indexPath])
-                break
+                blockOperation.addExecutionBlock {
+                    self.photoCollectionView.deleteItems(at: [indexPath])
+                }
             case .update:
                 guard let indexPath = indexPath else {break}
-                photoCollectionView.reloadItems(at: [indexPath])
-                break
+                blockOperation.addExecutionBlock {
+                    self.photoCollectionView.reloadItems(at: [indexPath])
+                }
             case .move:
                 guard let newIndexPath = newIndexPath else {break}
-                photoCollectionView.moveItem(at: indexPath!, to: newIndexPath)
-                break
+                blockOperation.addExecutionBlock {
+                    self.photoCollectionView.moveItem(at: indexPath!, to: newIndexPath)
+                }
         
             @unknown default:
                 fatalError("Invalid change type in controller(_:didChange:atSectionIndex:for:). Only .insert/delete/move/update should be possible.")
@@ -359,7 +371,7 @@ extension PhotoAlbumViewController : UICollectionViewDelegateFlowLayout {
                       layout collectionViewLayout: UICollectionViewLayout,
                       sizeForItemAt indexPath: IndexPath) -> CGSize {
 
-    let itemsPerRow: CGFloat = UIScreen.main.bounds.width > UIScreen.main.bounds.height ? 5.0 : 3.0
+    let itemsPerRow: CGFloat = UIScreen.main.bounds.width > UIScreen.main.bounds.height ? 5.0 : 5.0 //I need to resolve for 3.0 for portrait
     let paddingSpace = sectionInsets.left * (itemsPerRow + 1)
     let availableWidth = UIScreen.main.bounds.width - paddingSpace
     let widthPerItem = availableWidth / itemsPerRow
