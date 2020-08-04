@@ -48,7 +48,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         let predicate = NSPredicate(format: "pin == %@", pin)
         fetchRequest.predicate = predicate
         
-        fetchRequest.sortDescriptors = []
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "photoOrder", ascending: true)]
               
         fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "photos")
         fetchedResultsController.delegate = self
@@ -93,6 +93,13 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         centerMapOnLocation(clLocation , mapView: self.mapView)
         setUpPin()
         
+        //Setting Gesture
+        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(self.handleLongGesture(gesture:)))
+        longPressGesture.minimumPressDuration = 0.5
+        longPressGesture.delegate = self
+        longPressGesture.delaysTouchesBegan = true
+        photoCollectionView.addGestureRecognizer(longPressGesture)
+        
         //Setting Collection View
         photoCollectionView.delegate = self
         photoCollectionView.dataSource = self
@@ -116,8 +123,25 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+
         setupFetchedResultsController()
         //self.refresh()
+    }
+    
+    @objc func handleLongGesture(gesture: UILongPressGestureRecognizer) {
+        switch(gesture.state) {
+        case .began:
+            guard let selectedIndexPath = photoCollectionView.indexPathForItem(at: gesture.location(in: photoCollectionView)) else {
+                break
+            }
+            photoCollectionView.beginInteractiveMovementForItem(at: selectedIndexPath)
+        case .changed:
+            photoCollectionView.updateInteractiveMovementTargetPosition(gesture.location(in: gesture.view!))
+        case .ended:
+            photoCollectionView.endInteractiveMovement()
+        default:
+            photoCollectionView.cancelInteractiveMovement()
+        }
     }
         
     override func viewDidDisappear(_ animated: Bool) {
@@ -133,32 +157,33 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         let deleteCollection = NSBatchDeleteRequest(fetchRequest: fetchedResultsController!.fetchRequest as! NSFetchRequest<NSFetchRequestResult>)
         try? dataController.viewContext.execute(deleteCollection)
         */
-        
-        if let  objects = fetchedResultsController.fetchedObjects {
-            //MARK: - TODO: trying to hide the cells temporarily might need to review BlockOperation and how to cell.contentView.isHidden until the batch is complete. this way we can see the activity indicator.
-            let photosToDelete = photoCollectionView.indexPathsForVisibleItems
+       
+            if let  objects = self.fetchedResultsController.fetchedObjects {
+                //MARK: - TODO: trying to hide the cells temporarily might need to review BlockOperation and how to cell.contentView.isHidden until the batch is complete. this way we can see the activity indicator.
+                let photosToDelete = self.photoCollectionView.indexPathsForVisibleItems
             
-            //photoCollectionView.deleteItems(at: photosToDelete)
+                //photoCollectionView.deleteItems(at: photosToDelete)
             
-            for photoToDelete in photosToDelete {
-                photoCollectionView.cellForItem(at: photoToDelete)!.isHidden = true
-            }
+                for photoToDelete in photosToDelete {
+                    self.photoCollectionView.cellForItem(at: photoToDelete)!.isHidden = true
+                }
             
-            actInd.startAnimating()
-            for object in objects{
-                dataController.viewContext.performAndWait {
-                    dataController.viewContext.delete(object)
-                    try? dataController.viewContext.save()
+                self.actInd.startAnimating()
+                for object in objects{
+                    self.dataController.viewContext.performAndWait {
+                        self.dataController.viewContext.delete(object)
+                        try? self.dataController.viewContext.save()
+                    }
                 }
             }
+            self.photoCollectionView.reloadData()
+            self.photoCollectionView!.numberOfItems(inSection: 0)
+            self.dataController.viewContext.refreshAllObjects()
+            try? self.dataController.viewContext.save()
+            print("Now going to fetch new photos")
+            self.fetchFlickrPhotos()
         }
-        self.photoCollectionView.reloadData()
-        photoCollectionView!.numberOfItems(inSection: 0)
-        dataController.viewContext.refreshAllObjects()
-        try? dataController.viewContext.save()
-        print("Now going to fetch new photos")
-        fetchFlickrPhotos()
-     }
+     
             
     //MARK: - Internal Class Functions
     
@@ -248,6 +273,26 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         return fetchedResultsController.sections?.count ?? 1
     }
     
+    func collectionView(_ collectionView: UICollectionView, canMoveItemAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        //MARK: - TODO: Need to add a sort descriptor that would arrange/rearrange order
+        
+        let objectToMove = fetchedResultsController.object(at: sourceIndexPath)
+        let destinationObject = fetchedResultsController.object(at: destinationIndexPath)
+        //fetchedResultsController.indexPath(forObject: objectToMove) = sourceIndexPath
+        
+        //dataController.viewContext.delete(objectToMove)
+        objectToMove.photoOrder = Int16(destinationIndexPath.row)
+        destinationObject.photoOrder = Int16(sourceIndexPath.row)
+        
+        //fetchedResultsController.fetchedObjects?.insert(objectToMove, at: destinationIndexPath)
+        try? dataController.viewContext.save()
+        //photoCollectionView.moveItem(at: sourceIndexPath, to: destinationIndexPath)
+    }
+    
     //Provides the number of object per section(s)
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let sectionInfo = self.fetchedResultsController.sections![section]
@@ -262,12 +307,17 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: collectionCellID , for: indexPath) as! CollectionViewCell
         print("indexPath:\(indexPath)")
         //cell.sizeThatFits(frameSize)
+        cell.cellActivityIndicator.startAnimating()
+        
         
         if fetchedResultsController.fetchedObjects != nil {
             let cellPhoto = fetchedResultsController.object(at: indexPath)
             // Configure the cell’s contents.
             configureUI(cell: cell, photo: cellPhoto, atIndexPath: indexPath)
-        } else { print("fetchedObjects = nil") }
+        } else {
+            print("fetchedObjects = nil")
+            cell.albumPhoto.image = UIImage(named: "noImage")
+        }
         
        return cell
     }
@@ -400,6 +450,13 @@ extension PhotoAlbumViewController : UICollectionViewDelegateFlowLayout {
     return sectionInsets.left
   }
     
+}
+
+extension PhotoAlbumViewController: UIGestureRecognizerDelegate {
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive press: UIPress) -> Bool {
+        return true
+    }
 }
 
 
