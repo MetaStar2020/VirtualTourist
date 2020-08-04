@@ -72,14 +72,15 @@ class TravelLocationsMapViewController: UIViewController {
     }
     
     private func currentLocation() {
-       locationManager.delegate = self
-       locationManager.desiredAccuracy = kCLLocationAccuracyBest
-       if #available(iOS 11.0, *) {
-          locationManager.showsBackgroundLocationIndicator = true
-       } else {
-          // Fallback on earlier versions
-       }
-       locationManager.startUpdatingLocation()
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        if #available(iOS 11.0, *) {
+            locationManager.showsBackgroundLocationIndicator = true
+        } else {
+            // Fallback on earlier versions
+        }
+        
+        locationManager.startUpdatingLocation()
     }
         
     private func setUpPins() {
@@ -202,15 +203,37 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
         }
     
     }
+    
+    func mapViewDidChangeVisibleRegion(_ mapView: MKMapView) {
+        let defaults = UserDefaults.standard
+        let locationData = ["lat": mapView.centerCoordinate.latitude
+            , "long": mapView.centerCoordinate.longitude
+            , "latDelta": mapView.region.span.latitudeDelta
+            , "longDelta": mapView.region.span.longitudeDelta]
+        defaults.set(locationData, forKey: "userMapRegion")
+        //print("user's locatin is saved in preferences")
+        //print("userMapRegion is: \(UserDefaults.standard.dictionary(forKey: "userMapRegion"))")
+    }
 }
 
 extension TravelLocationsMapViewController: CLLocationManagerDelegate {
    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
       
-      let location = locations.last! as CLLocation
-      let currentLocation = location.coordinate
-      let coordinateRegion = MKCoordinateRegion(center: currentLocation, latitudinalMeters: 100000, longitudinalMeters: 100000)
-      mapView.setRegion(coordinateRegion, animated: true)
+    if let userCoordinate = UserDefaults.standard.dictionary(forKey: "userMapRegion") {
+        print("userMapRegion retrieved")
+        let center = CLLocationCoordinate2D(latitude: userCoordinate["lat"] as! Double, longitude: userCoordinate["long"] as! Double)
+        let span = MKCoordinateSpan(latitudeDelta: userCoordinate["latDelta"] as! Double, longitudeDelta: userCoordinate["longDelta"] as! Double)
+        let userRegion = MKCoordinateRegion(center: center, span: span)
+        
+        mapView.setRegion(userRegion, animated: true)
+        
+    } else {
+        let location = locations.last! as CLLocation
+        let currentLocation = location.coordinate
+        let coordinateRegion = MKCoordinateRegion(center: currentLocation, latitudinalMeters: 100000, longitudinalMeters: 100000)
+        mapView.setRegion(coordinateRegion, animated: true)
+    }
+    
       locationManager.stopUpdatingLocation()
    }
    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
