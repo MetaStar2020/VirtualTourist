@@ -19,7 +19,7 @@ class FlickrClient {
         static let apiKeyParam = "&api_key=\(flickrAPIKey)"
         
         //Static queries for the request
-        static let bboxQuery = "&bbox=-10%2C-10%2C10%2C10"
+        static let bboxQuery = "&bbox=-5%2C-5%2C5%2C5"
         static let contentTypeQuery = "&content_type=1"
         static let flickrQuery = Endpoints.bboxQuery + Endpoints.contentTypeQuery
         

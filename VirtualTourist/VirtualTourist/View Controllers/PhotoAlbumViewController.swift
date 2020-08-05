@@ -64,7 +64,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         
     //MARK: - View Life Cycle
             
-    fileprivate func fetchFlickrPhotos() {
+    fileprivate func fetchFlickrPhotoURLs() {
         actInd.startAnimating()
         newCollectionButton.isEnabled = false
         FlickrClient.search(lat: pin!.latitude, long: pin!.longitude) { flickrPhotos, error in
@@ -83,6 +83,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
                         photo.pin = self.pin
                 
                         try? self.dataController.viewContext.save()
+                        self.photoCollectionView.reloadData()
                         //FlickrClient.downloadPosterImage(photo: photo, completion: self.handleDownload(data:error:))
                     i += 1
                 }
@@ -134,7 +135,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         //refactor this with activity indicator and loading images
         if (fetchedResultsController.fetchedObjects!.isEmpty == true) {
             print("FRC is empty")
-            fetchFlickrPhotos()
+            fetchFlickrPhotoURLs()
         }
                     
     }
@@ -200,7 +201,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
             self.dataController.viewContext.refreshAllObjects()
             try? self.dataController.viewContext.save()
             print("Now going to fetch new photos")
-            self.fetchFlickrPhotos()
+            self.fetchFlickrPhotoURLs()
         }
      
             
@@ -339,38 +340,46 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: collectionCellID , for: indexPath) as! CollectionViewCell
         print("cell indexPath:\(indexPath)")
         //cell.sizeThatFits(frameSize)
-        cell.cellActivityIndicator.startAnimating()
         
+        
+        if let cellPhotoData = self.fetchedResultsController.object(at: indexPath).imageData {
+            cell.albumPhoto.image = UIImage(data: cellPhotoData)
         //Downloading the Images from URLs
-        if  photoURLs.count != 0 {
+        } else if  photoURLs.count != 0 {
+            
             if let url = photoURLs[indexPath.row] {
+                cell.cellActivityIndicator.startAnimating()
                 cell.albumPhoto.image = UIImage(named: "noImage")
-                FlickrClient.downloadPosterImage(photoURL: url) { data, error in
-                    if error != nil {
-                        print("error in downloading data from a photo")
-                    } else {
-                        if data != nil {
-                            //print(String(decoding: data!, as: UTF8.self ))
-                            //let photo = Photo(context: dataController.viewContext)
-                            let cellPhoto = self.fetchedResultsController.object(at: indexPath)
-                            cellPhoto.imageData = data
-                            print("Image.image \(cellPhoto.imageData!)")
-                            try? self.dataController.viewContext.save()
-                            cell.albumPhoto.image = UIImage(data: data!)
-                            //self.configureUI(cell: cell, photo: cellPhoto, atIndexPath: indexPath)
-                            //photo.pin = self.pin
+                //DispatchQueue.global().async {
+                    FlickrClient.downloadPosterImage(photoURL: url) { data, error in
+                        if error != nil {
+                            print("error in downloading data from a photo")
+                        } else {
+                            if data != nil {
+                                //print(String(decoding: data!, as: UTF8.self ))
+                                //let photo = Photo(context: dataController.viewContext)
+                                let cellPhoto = self.fetchedResultsController.object(at: indexPath)
+                                cellPhoto.imageData = data
+                                print("Image.image \(cellPhoto.imageData!)")
+                                try? self.dataController.viewContext.save()
+                                cell.albumPhoto.image = UIImage(data: data!)
+                                //self.configureUI(cell: cell, photo: cellPhoto, atIndexPath: indexPath)
+                                //photo.pin = self.pin
                     
-                            //self.photoCollectionView.reloadData()
-                            //try? self.dataController.viewContext.save()
-                            print("one photo is saved")
-                            //self.actInd.stopAnimating()
+                                //self.photoCollectionView.reloadData()
+                                //try? self.dataController.viewContext.save()
+                                print("one photo is saved")
+                                cell.cellActivityIndicator.stopAnimating()
+                                //self.actInd.stopAnimating()
+                            }
                         }
                     }
-                }
+                //}
             }
         } else {
             cell.albumPhoto.image = UIImage(named: "noImage")
         }
+        
         
         
         
@@ -384,7 +393,6 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         }*/
         
         //***might not be the right place to stopAnimating
-        cell.cellActivityIndicator.stopAnimating()
        return cell
     }
     
