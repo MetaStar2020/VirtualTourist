@@ -39,6 +39,8 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
  
     var pin: Pin!
     
+    var photoURLs: [URL?] = []
+    
     //var photos: [NSManagedObject] = []
         
     //MARK: - Private Functions
@@ -67,14 +69,30 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         newCollectionButton.isEnabled = false
         FlickrClient.search(lat: pin!.latitude, long: pin!.longitude) { flickrPhotos, error in
             
-            for photo in flickrPhotos {
-                print("this is flickr photo: \(flickrPhotos)")
-                FlickrClient.downloadPosterImage(photo: photo, completion: self.handleDownload(data:error:))
+            if error == nil {
+                var i: Int = 0
+                self.noImage.isHidden = true
+                
+                for photoURL in flickrPhotos {
+                    print("this is flickr photo: \(flickrPhotos)")
+                    self.photoURLs.append(FlickrClient.photoPathURL(photo: photoURL))
+                
+                    //Create a Photo ManagedObject and assign its order in sync with array
+                    let photo = Photo(context: self.dataController.viewContext)
+                        photo.photoOrder = Int16(i)
+                        photo.pin = self.pin
+                
+                        try? self.dataController.viewContext.save()
+                        //FlickrClient.downloadPosterImage(photo: photo, completion: self.handleDownload(data:error:))
+                    i += 1
+                }
+                i = 0
             }
             
         }
         setupFetchedResultsController()
         self.photoCollectionView.reloadData()
+        actInd.stopAnimating()
         newCollectionButton.isEnabled = true
     }
     
@@ -115,6 +133,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         
         //refactor this with activity indicator and loading images
         if (fetchedResultsController.fetchedObjects!.isEmpty == true) {
+            print("FRC is empty")
             fetchFlickrPhotos()
         }
                     
@@ -196,16 +215,16 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         uiView.superview!.addSubview(actInd)
     }
     
-    //Retrieving Photos from Flickr
+    //Retrieving Photos from Flickr ** need to be removed!
     func handleDownload(data: Data?, error: Error?) {
         if error != nil {
             print("error in downloading data from a photo")
         } else {
             if data != nil {
                 //print(String(decoding: data!, as: UTF8.self ))
-                let photo = Photo(context: dataController.viewContext)
-                photo.imageData = data
-                photo.pin = self.pin
+                //let photo = Photo(context: dataController.viewContext)
+                //fetchedResultsController.object(at: <#T##IndexPath#>).imageData = data
+                //photo.pin = self.pin
                 
                 //self.photoCollectionView.reloadData()
                 try? dataController.viewContext.save()
@@ -280,13 +299,26 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         //MARK: - TODO: Need to add a sort descriptor that would arrange/rearrange order
         
-        let objectToMove = fetchedResultsController.object(at: sourceIndexPath)
-        let destinationObject = fetchedResultsController.object(at: destinationIndexPath)
-        //fetchedResultsController.indexPath(forObject: objectToMove) = sourceIndexPath
-        
         //dataController.viewContext.delete(objectToMove)
-        objectToMove.photoOrder = Int16(destinationIndexPath.row)
-        destinationObject.photoOrder = Int16(sourceIndexPath.row)
+        if sourceIndexPath.row < destinationIndexPath.row {
+            
+            for i in sourceIndexPath.row+1...destinationIndexPath.row {
+                fetchedResultsController.object(at: [0,i]).photoOrder -= 1
+            }
+            fetchedResultsController.object(at: sourceIndexPath).photoOrder = Int16(destinationIndexPath.row)
+        } else {
+            
+            for i in sourceIndexPath.row-1...destinationIndexPath.row {
+                fetchedResultsController.object(at: [0,i]).photoOrder += 1
+            }
+            fetchedResultsController.object(at: sourceIndexPath).photoOrder = Int16(destinationIndexPath.row)
+        }
+
+        //remove and insert in array
+        let temp = photoURLs[sourceIndexPath.row]
+        photoURLs.remove(at: sourceIndexPath.row)
+        photoURLs.insert(temp, at: destinationIndexPath.row)
+        
         
         //fetchedResultsController.fetchedObjects?.insert(objectToMove, at: destinationIndexPath)
         try? dataController.viewContext.save()
@@ -305,20 +337,54 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
        // Fetch a cell of the appropriate type.
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: collectionCellID , for: indexPath) as! CollectionViewCell
-        print("indexPath:\(indexPath)")
+        print("cell indexPath:\(indexPath)")
         //cell.sizeThatFits(frameSize)
         cell.cellActivityIndicator.startAnimating()
         
+        //Downloading the Images from URLs
+        if  photoURLs.count != 0 {
+            if let url = photoURLs[indexPath.row] {
+                cell.albumPhoto.image = UIImage(named: "noImage")
+                FlickrClient.downloadPosterImage(photoURL: url) { data, error in
+                    if error != nil {
+                        print("error in downloading data from a photo")
+                    } else {
+                        if data != nil {
+                            //print(String(decoding: data!, as: UTF8.self ))
+                            //let photo = Photo(context: dataController.viewContext)
+                            let cellPhoto = self.fetchedResultsController.object(at: indexPath)
+                            cellPhoto.imageData = data
+                            print("Image.image \(cellPhoto.imageData!)")
+                            try? self.dataController.viewContext.save()
+                            cell.albumPhoto.image = UIImage(data: data!)
+                            //self.configureUI(cell: cell, photo: cellPhoto, atIndexPath: indexPath)
+                            //photo.pin = self.pin
+                    
+                            //self.photoCollectionView.reloadData()
+                            //try? self.dataController.viewContext.save()
+                            print("one photo is saved")
+                            //self.actInd.stopAnimating()
+                        }
+                    }
+                }
+            }
+        } else {
+            cell.albumPhoto.image = UIImage(named: "noImage")
+        }
         
-        if fetchedResultsController.fetchedObjects != nil {
+        
+        
+        /*if fetchedResultsController.fetchedObjects != nil {
             let cellPhoto = fetchedResultsController.object(at: indexPath)
             // Configure the cell’s contents.
             configureUI(cell: cell, photo: cellPhoto, atIndexPath: indexPath)
         } else {
             print("fetchedObjects = nil")
             cell.albumPhoto.image = UIImage(named: "noImage")
-        }
+        }*/
         
+        //***might not be the right place to stopAnimating
+        cell.cellActivityIndicator.stopAnimating()
        return cell
     }
     
@@ -328,6 +394,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         try? dataController.viewContext.save()
     }
     
+    //***Might need to remove
     func configureUI(cell: CollectionViewCell, photo: Photo, atIndexPath indexPath: IndexPath) {
         
         if photo.imageData != nil{

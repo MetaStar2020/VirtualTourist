@@ -95,6 +95,11 @@ class FlickrClient {
         return task
     }
     
+    class func photoPathURL(photo: FlickrPhoto) -> URL {
+        return Endpoints.photoPath(photo.farm, photo.server, photo.id, photo.secret).url
+    }
+
+    /*
     class func downloadPosterImage(photo: FlickrPhoto, completion: @escaping (Data?, Error?) -> Void) {
         let task = URLSession.shared.dataTask(with: Endpoints.photoPath(photo.farm, photo.server, photo.id, photo.secret).url) { data, response, error in
             DispatchQueue.main.async {
@@ -102,6 +107,14 @@ class FlickrClient {
             }
         }
         task.resume()
-    }
+    }*/
     
+    class func downloadPosterImage(photoURL: URL, completion: @escaping (Data?, Error?) -> Void) {
+        let task = URLSession.shared.dataTask(with: photoURL) { data, response, error in
+            DispatchQueue.main.async {
+                completion(data, error)
+            }
+        }
+        task.resume()
+    }
 }
