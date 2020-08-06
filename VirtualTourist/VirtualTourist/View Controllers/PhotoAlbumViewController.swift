@@ -73,7 +73,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
                 var i: Int = 0
                 
                 for photoURL in flickrPhotos {
-                    print("this is flickr photo: \(flickrPhotos)")
+                    
                     self.photoURLs.append(FlickrClient.photoPathURL(photo: photoURL))
                 
                     //Create a Photo ManagedObject and assign its order in sync with array
@@ -128,7 +128,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         self.photoCollectionView.collectionViewLayout = self.photoFlowLayout
         //photoFlowLayout.itemSize = frameSize
         
-        noImage.isHidden = true
+        //noImage.isHidden = true
         self.showActivityIndicator(uiView: noImage)
         setupFetchedResultsController()
         
@@ -213,6 +213,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         actInd.center = uiView.center
         actInd.hidesWhenStopped = true
         actInd.style = UIActivityIndicatorView.Style.large
+        actInd.color = UIColor.red
         uiView.superview!.addSubview(actInd)
     }
     
@@ -298,30 +299,36 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     }
     
     func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        print("sourcePath: \(sourceIndexPath) and destination: \(destinationIndexPath)")
     
+        DispatchQueue.main.async {
         if sourceIndexPath.row < destinationIndexPath.row {
             
             for i in sourceIndexPath.row+1...destinationIndexPath.row {
-                fetchedResultsController.object(at: [0,i]).photoOrder -= 1
+                self.fetchedResultsController.object(at: [0,i]).photoOrder -= 1
             }
-            fetchedResultsController.object(at: sourceIndexPath).photoOrder = Int16(destinationIndexPath.row)
+            self.fetchedResultsController.object(at: sourceIndexPath).photoOrder = Int16(destinationIndexPath.row)
         } else {
             
             for i in sourceIndexPath.row-1...destinationIndexPath.row {
-                fetchedResultsController.object(at: [0,i]).photoOrder += 1
+                self.fetchedResultsController.object(at: [0,i]).photoOrder += 1
             }
-            fetchedResultsController.object(at: sourceIndexPath).photoOrder = Int16(destinationIndexPath.row)
+            self.fetchedResultsController.object(at: sourceIndexPath).photoOrder = Int16(destinationIndexPath.row)
         }
 
-        //remove and insert in array
-        let temp = photoURLs[sourceIndexPath.row]
-        photoURLs.remove(at: sourceIndexPath.row)
-        photoURLs.insert(temp, at: destinationIndexPath.row)
-        
+        //remove and insert in array ***Might be unecessary? or can be accessed if moving while downloading. (?)
+            if self.photoURLs.count != 0 {
+                let temp = self.photoURLs[sourceIndexPath.row]
+                self.photoURLs.remove(at: sourceIndexPath.row)
+                self.photoURLs.insert(temp, at: destinationIndexPath.row)
+        }
         
         //fetchedResultsController.fetchedObjects?.insert(objectToMove, at: destinationIndexPath)
-        try? dataController.viewContext.save()
+            try? self.dataController.viewContext.save()
         //photoCollectionView.moveItem(at: sourceIndexPath, to: destinationIndexPath)
+            self.setupFetchedResultsController()
+        }
+        
     }
     
     //Provides the number of object per section(s)
@@ -464,12 +471,16 @@ extension PhotoAlbumViewController: NSFetchedResultsControllerDelegate {
             case .update:
                 guard let indexPath = indexPath else {break}
                 blockOperation.addExecutionBlock {
+                    DispatchQueue.main.async {
                     self.photoCollectionView.reloadItems(at: [indexPath])
+                    }
                 }
             case .move:
                 guard let newIndexPath = newIndexPath else {break}
                 blockOperation.addExecutionBlock {
+                    DispatchQueue.main.async {
                     self.photoCollectionView.moveItem(at: indexPath!, to: newIndexPath)
+                    }
                 }
         
             @unknown default:
