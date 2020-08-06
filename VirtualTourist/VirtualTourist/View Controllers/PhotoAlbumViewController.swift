@@ -52,7 +52,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         fetchRequest.predicate = predicate
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "photoOrder", ascending: true)]
 
-        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "photos")
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
         do {
             try fetchedResultsController.performFetch()
@@ -180,12 +180,12 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
        
             if let  objects = self.fetchedResultsController.fetchedObjects {
                 //MARK: - TODO: trying to hide the cells temporarily might need to review BlockOperation and how to cell.contentView.isHidden until the batch is complete. this way we can see the activity indicator.
-                let photosToDelete = self.photoCollectionView.indexPathsForVisibleItems
+                let photosToHide = self.photoCollectionView.indexPathsForVisibleItems
             
                 //photoCollectionView.deleteItems(at: photosToDelete)
             
-                for photoToDelete in photosToDelete {
-                    self.photoCollectionView.cellForItem(at: photoToDelete)!.isHidden = true
+                for photoToHide in photosToHide {
+                    self.photoCollectionView.cellForItem(at: photoToHide)!.isHidden = true
                 }
             
                 self.actInd.startAnimating()
@@ -298,9 +298,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     }
     
     func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        //MARK: - TODO: Need to add a sort descriptor that would arrange/rearrange order
-        
-        //dataController.viewContext.delete(objectToMove)
+    
         if sourceIndexPath.row < destinationIndexPath.row {
             
             for i in sourceIndexPath.row+1...destinationIndexPath.row {
