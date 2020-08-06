@@ -48,10 +48,10 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     fileprivate func setupFetchedResultsController() {
         let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
         let predicate = NSPredicate(format: "pin == %@", pin)
-        fetchRequest.predicate = predicate
         
+        fetchRequest.predicate = predicate
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "photoOrder", ascending: true)]
-              
+
         fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "photos")
         fetchedResultsController.delegate = self
         do {
@@ -71,7 +71,6 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
             
             if error == nil {
                 var i: Int = 0
-                self.noImage.isHidden = true
                 
                 for photoURL in flickrPhotos {
                     print("this is flickr photo: \(flickrPhotos)")
@@ -87,6 +86,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
                         //FlickrClient.downloadPosterImage(photo: photo, completion: self.handleDownload(data:error:))
                     i += 1
                 }
+                self.noImage.isHidden = true
                 i = 0
             }
             
@@ -343,13 +343,14 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         
         
         if let cellPhotoData = self.fetchedResultsController.object(at: indexPath).imageData {
+            print("pin: \(String(describing: self.fetchedResultsController.object(at: indexPath).pin))")
             cell.albumPhoto.image = UIImage(data: cellPhotoData)
         //Downloading the Images from URLs
         } else if  photoURLs.count != 0 {
             
             if let url = photoURLs[indexPath.row] {
                 cell.cellActivityIndicator.startAnimating()
-                cell.albumPhoto.image = UIImage(named: "noImage")
+                //cell.albumPhoto.image = UIImage(named: "noImage")
                 //DispatchQueue.global().async {
                     FlickrClient.downloadPosterImage(photoURL: url) { data, error in
                         if error != nil {
@@ -377,7 +378,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
                 //}
             }
         } else {
-            cell.albumPhoto.image = UIImage(named: "noImage")
+            //cell.albumPhoto.image = UIImage(named: "noImage")
         }
         
         
