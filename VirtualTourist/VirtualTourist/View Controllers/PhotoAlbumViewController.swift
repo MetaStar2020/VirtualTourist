@@ -334,27 +334,28 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
             }
             self.fetchedResultsController.object(at: sourceIndexPath).photoOrder = Int16(destinationIndexPath.row)
         }*/
+        print("sourceIndexPath: \(sourceIndexPath.item) and destIndez: \(destinationIndexPath.item)")
         
         if sourceIndexPath.item < destinationIndexPath.item {
             
             for i in sourceIndexPath.item+1...destinationIndexPath.item {
                 self.fetchedResultsController.object(at: IndexPath(item: i, section: 0)).photoOrder -= 1
             }
-            self.fetchedResultsController.object(at: sourceIndexPath).photoOrder = Int16(destinationIndexPath.item)
+            self.fetchedResultsController.object(at: sourceIndexPath).photoOrder = Int16(destinationIndexPath.item+1)
         } else {
             
             for i in (destinationIndexPath.item...sourceIndexPath.item-1).reversed() {
                 self.fetchedResultsController.object(at: IndexPath(item: i, section: 0)).photoOrder += 1
                 
             }
-            self.fetchedResultsController.object(at: sourceIndexPath).photoOrder = Int16(destinationIndexPath.item)
+            self.fetchedResultsController.object(at: sourceIndexPath).photoOrder = Int16(destinationIndexPath.item+1)
         }
 
         //remove and insert in array ***Might be unecessary? or can be accessed if moving while downloading. (?)
             if self.photoURLs.count != 0 {
-                let temp = self.photoURLs[sourceIndexPath.row]
-                self.photoURLs.remove(at: sourceIndexPath.row)
-                self.photoURLs.insert(temp, at: destinationIndexPath.row)
+                let temp = self.photoURLs[sourceIndexPath.item]
+                self.photoURLs.remove(at: sourceIndexPath.item)
+                self.photoURLs.insert(temp, at: destinationIndexPath.item)
         }
         
         //fetchedResultsController.fetchedObjects?.insert(objectToMove, at: destinationIndexPath)
