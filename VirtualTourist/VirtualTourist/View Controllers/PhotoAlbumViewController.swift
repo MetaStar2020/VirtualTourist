@@ -27,6 +27,9 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     bottom: 50.0,
     right: 5.0)
     
+    let itemsPerRowPortrait: CGFloat = 5.0
+    let itemsPerRowLandscape: CGFloat = 5.0
+    
     let actInd: UIActivityIndicatorView = UIActivityIndicatorView()
     
     var frameSize: CGSize = CGSize(width: 300.0, height: 300.0)
@@ -208,13 +211,24 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     //MARK: - Internal Class Functions
     
     //Setting up the activity Indicator programmically - storyboard won't allow overlap
-    func showActivityIndicator(uiView: UIView) {
+    /*func showActivityIndicator(uiView: UIView) {
         actInd.frame = CGRect(x: 0.0, y: 0.0, width: 40.0, height: 40.0)
         actInd.center = uiView.center
         actInd.hidesWhenStopped = true
         actInd.style = UIActivityIndicatorView.Style.large
         actInd.color = UIColor.red
         uiView.superview!.addSubview(actInd)
+    }*/
+    
+    func showActivityIndicator(uiView: UIView) {
+        let container: UIView = UIView()
+        container.frame = CGRect(x: 0, y: 0, width: 80, height: 80) // Set X and Y whatever you want
+        container.backgroundColor = .clear
+        actInd.style = UIActivityIndicatorView.Style.large
+        actInd.center = self.view.center
+        container.addSubview(actInd)
+        self.view.addSubview(container)
+        //actInd.startAnimating()
     }
     
     //Retrieving Photos from Flickr ** need to be removed!
@@ -301,19 +315,39 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
     func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         print("sourcePath: \(sourceIndexPath) and destination: \(destinationIndexPath)")
     
-        DispatchQueue.main.async {
-        if sourceIndexPath.row < destinationIndexPath.row {
-            
-            for i in sourceIndexPath.row+1...destinationIndexPath.row {
-                self.fetchedResultsController.object(at: [0,i]).photoOrder -= 1
-            }
+        /*
+        let itemsPerRow: Int = UIScreen.main.bounds.width > UIScreen.main.bounds.height ? Int(itemsPerRowLandscape) : Int(itemsPerRowPortrait)
+        let sourceOrder: Int = sourceIndexPath.section * itemsPerRow + sourceIndexPath.row
+        let destinationOrder: Int = destinationIndexPath.section * itemsPerRow + destinationIndexPath.row
+        
+        if sourceOrder < destinationOrder {
+            var nextIndexPath: IndexPath
+            for i in sourceOrder+1...destinationOrder {
+                nextIndexPath = [Int(i/itemsPerRow), i%itemsPerRow ]
+                self.fetchedResultsController.object(at: nextIndexPath).photoOrder -= 1            }
             self.fetchedResultsController.object(at: sourceIndexPath).photoOrder = Int16(destinationIndexPath.row)
         } else {
-            
-            for i in sourceIndexPath.row-1...destinationIndexPath.row {
-                self.fetchedResultsController.object(at: [0,i]).photoOrder += 1
+            var nextIndexPath: IndexPath
+            for i in (destinationOrder...sourceOrder-1).reversed() {
+                nextIndexPath = [Int(i/itemsPerRow), i%itemsPerRow ]
+                self.fetchedResultsController.object(at: nextIndexPath).photoOrder += 1
             }
             self.fetchedResultsController.object(at: sourceIndexPath).photoOrder = Int16(destinationIndexPath.row)
+        }*/
+        
+        if sourceIndexPath.item < destinationIndexPath.item {
+            
+            for i in sourceIndexPath.item+1...destinationIndexPath.item {
+                self.fetchedResultsController.object(at: IndexPath(item: i, section: 0)).photoOrder -= 1
+            }
+            self.fetchedResultsController.object(at: sourceIndexPath).photoOrder = Int16(destinationIndexPath.item)
+        } else {
+            
+            for i in (destinationIndexPath.item...sourceIndexPath.item-1).reversed() {
+                self.fetchedResultsController.object(at: IndexPath(item: i, section: 0)).photoOrder += 1
+                
+            }
+            self.fetchedResultsController.object(at: sourceIndexPath).photoOrder = Int16(destinationIndexPath.item)
         }
 
         //remove and insert in array ***Might be unecessary? or can be accessed if moving while downloading. (?)
@@ -326,8 +360,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         //fetchedResultsController.fetchedObjects?.insert(objectToMove, at: destinationIndexPath)
             try? self.dataController.viewContext.save()
         //photoCollectionView.moveItem(at: sourceIndexPath, to: destinationIndexPath)
-            self.setupFetchedResultsController()
-        }
+        self.setupFetchedResultsController()
         
     }
     
@@ -348,7 +381,7 @@ class PhotoAlbumViewController: UIViewController,  UICollectionViewDelegate, UIC
         
         
         if let cellPhotoData = self.fetchedResultsController.object(at: indexPath).imageData {
-            print("pin: \(String(describing: self.fetchedResultsController.object(at: indexPath).pin))")
+            print("adding a photo in the album")
             cell.albumPhoto.image = UIImage(data: cellPhotoData)
         //Downloading the Images from URLs
         } else if  photoURLs.count != 0 {
@@ -506,7 +539,7 @@ extension PhotoAlbumViewController : UICollectionViewDelegateFlowLayout {
                       layout collectionViewLayout: UICollectionViewLayout,
                       sizeForItemAt indexPath: IndexPath) -> CGSize {
 
-    let itemsPerRow: CGFloat = UIScreen.main.bounds.width > UIScreen.main.bounds.height ? 5.0 : 5.0 //I need to resolve for 3.0 for portrait
+    let itemsPerRow: CGFloat = UIScreen.main.bounds.width > UIScreen.main.bounds.height ? itemsPerRowLandscape : itemsPerRowPortrait //I need to resolve for 3.0 for portrait
     let paddingSpace = sectionInsets.left * (itemsPerRow + 1)
     let availableWidth = UIScreen.main.bounds.width - paddingSpace
     let widthPerItem = availableWidth / itemsPerRow
