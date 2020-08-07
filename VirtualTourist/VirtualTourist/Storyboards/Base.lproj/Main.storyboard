@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="3Os-cz-yNX">
-    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -13,11 +13,11 @@
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="TravelLocationsMapViewController" customModule="VirtualTourist" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="DOh-Q7-NRK">
-                                <rect key="frame" x="0.0" y="88" width="414" height="774"/>
+                                <rect key="frame" x="0.0" y="88" width="375" height="690"/>
                             </mapView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
@@ -44,14 +44,14 @@
             <objects>
                 <viewController id="LfJ-HQ-DuJ" customClass="PhotoAlbumViewController" customModule="VirtualTourist" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Q9s-p2-Svl">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="g9q-ol-bSt">
-                                <rect key="frame" x="0.0" y="88" width="414" height="225"/>
+                                <rect key="frame" x="0.0" y="88" width="375" height="141"/>
                             </mapView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="X6g-AO-27i">
-                                <rect key="frame" x="0.0" y="311" width="414" height="507"/>
+                                <rect key="frame" x="0.0" y="311" width="375" height="423"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="PoQ-AP-i9T">
                                     <size key="itemSize" width="226" height="200"/>
@@ -60,12 +60,12 @@
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <imageView key="backgroundView" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.5" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="noImage" id="YGf-3N-Fne">
-                                    <rect key="frame" x="0.0" y="0.0" width="414" height="507"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="423"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 </imageView>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFill" reuseIdentifier="CollectionViewCell" id="eFm-fF-eGr" customClass="CollectionViewCell" customModule="VirtualTourist" customModuleProvider="target">
-                                        <rect key="frame" x="94" y="0.0" width="226" height="200"/>
+                                        <rect key="frame" x="74.666666666666671" y="0.0" width="226" height="200"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFill" insetsLayoutMarginsFromSafeArea="NO" id="Mpd-kY-MZ0">
                                             <rect key="frame" x="0.0" y="0.0" width="226" height="200"/>
@@ -95,12 +95,12 @@
                                 </cells>
                             </collectionView>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OyH-rk-Sfr">
-                                <rect key="frame" x="0.0" y="818" width="414" height="44"/>
+                                <rect key="frame" x="0.0" y="734" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <items>
                                     <barButtonItem style="plain" id="9mV-Vs-k6w">
-                                        <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="rwc-lc-EoR">
-                                            <rect key="frame" x="20" y="1.5" width="374" height="41"/>
+                                        <button key="customView" opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="rwc-lc-EoR">
+                                            <rect key="frame" x="16" y="1.6666666666666679" width="343" height="41"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="24"/>
                                             <state key="normal" title="New Collection"/>
@@ -115,9 +115,13 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
                             <constraint firstItem="g9q-ol-bSt" firstAttribute="leading" secondItem="FwI-s3-sox" secondAttribute="leading" id="1Qm-cE-PeQ"/>
-                            <constraint firstItem="X6g-AO-27i" firstAttribute="top" secondItem="FwI-s3-sox" secondAttribute="top" constant="223" id="22G-It-2Iv"/>
+                            <constraint firstItem="X6g-AO-27i" firstAttribute="top" secondItem="FwI-s3-sox" secondAttribute="top" constant="223" id="22G-It-2Iv">
+                                <variation key="heightClass=compact-widthClass=compact" constant="150"/>
+                            </constraint>
                             <constraint firstItem="g9q-ol-bSt" firstAttribute="centerX" secondItem="Q9s-p2-Svl" secondAttribute="centerX" id="5Cg-Oi-WHa"/>
-                            <constraint firstItem="FwI-s3-sox" firstAttribute="bottom" secondItem="g9q-ol-bSt" secondAttribute="bottom" constant="549" id="7Sb-gQ-y4b"/>
+                            <constraint firstItem="FwI-s3-sox" firstAttribute="bottom" secondItem="g9q-ol-bSt" secondAttribute="bottom" constant="549" id="7Sb-gQ-y4b">
+                                <variation key="heightClass=compact-widthClass=compact" constant="300"/>
+                            </constraint>
                             <constraint firstItem="X6g-AO-27i" firstAttribute="leading" secondItem="g9q-ol-bSt" secondAttribute="leading" id="IcN-Tu-XkP"/>
                             <constraint firstItem="X6g-AO-27i" firstAttribute="bottom" secondItem="FwI-s3-sox" secondAttribute="bottom" constant="-44" id="dqv-vy-4en"/>
                             <constraint firstItem="X6g-AO-27i" firstAttribute="trailing" secondItem="g9q-ol-bSt" secondAttribute="trailing" id="eqj-ye-Lq8"/>
@@ -144,7 +148,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="3Os-cz-yNX" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Y3i-ht-mnq">
-                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <rect key="frame" x="0.0" y="44" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>

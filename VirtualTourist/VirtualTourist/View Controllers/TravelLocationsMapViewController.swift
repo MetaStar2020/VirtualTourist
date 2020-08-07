@@ -12,21 +12,35 @@ import CoreData
 
 class TravelLocationsMapViewController: UIViewController {
 
+    //MARK: - Outlets
     @IBOutlet weak var mapView: MKMapView!
     
     
-    //MARK: - Variables
+    //MARK: - Properties: Variables and Constants
+    
+    var dataController: DataController!
+    
+    var pins: [NSManagedObject] = []
+    
+    //MARK: - Fileprivate Functions
+    
     fileprivate let locationManager: CLLocationManager = {
         let manager = CLLocationManager()
         manager.requestWhenInUseAuthorization()
         return manager
     }()
     
-    var dataController: DataController!
+    fileprivate func fetchPins() {
+        //Fetching Pins from CoreData persistent store
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Pin")
+        do {
+            pins = try dataController.viewContext.fetch(fetchRequest)
+        } catch let error as NSError {
+            print("Could not fetch. \(error), \(error.userInfo)")
+        }
+    }
     
-    var pins: [NSManagedObject] = []
-    
-//MARK: - View Life Cycle
+    //MARK: - View Life Cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -109,16 +123,6 @@ class TravelLocationsMapViewController: UIViewController {
         self.mapView.addAnnotations(annotations)
     }
     
-    fileprivate func fetchPins() {
-        //Fetching Pins from CoreData persistent store
-        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Pin")
-        do {
-            pins = try dataController.viewContext.fetch(fetchRequest)
-        } catch let error as NSError {
-            print("Could not fetch. \(error), \(error.userInfo)")
-        }
-    }
-    
     @objc func addPin(longGesture: UIGestureRecognizer) {
         
         if longGesture.state == .began {
@@ -174,18 +178,6 @@ extension TravelLocationsMapViewController: MKMapViewDelegate {
         
         return pinView
     }
-    
-    /*
-    //MARK: - TODO: (this should work in reverse. add to Pin first and then populate) Adds new 'pin'(s) as NSManagedObject 'Pin'
-    func mapView(_ mapView: MKMapView, didAdd views: [MKAnnotationView]) {
-        print("User is adding a pin here")
-        for addedPin in views {
-            let newPin = Pin(context: dataController.viewContext)
-            newPin.latitude = addedPin.annotation?.coordinate.latitude ?? 0.0
-            newPin.longitude = addedPin.annotation?.coordinate.longitude ?? 0.0
-            try? dataController.viewContext.save()
-        }
-    }*/
     
     //User tapped on the pin
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
